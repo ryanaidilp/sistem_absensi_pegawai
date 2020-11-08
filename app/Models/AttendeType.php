@@ -14,6 +14,6 @@ class AttendeType extends Model
 
     public function kode_absen()
     {
-        return $this->hasMany(AttendeCode::class, 'attende_code_id', 'id');
+        return $this->hasMany(AttendeCode::class, 'code_type_id', 'id');
     }
 }

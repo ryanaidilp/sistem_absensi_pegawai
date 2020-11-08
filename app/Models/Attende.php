@@ -12,6 +12,12 @@ class Attende extends Model
 {
     use HasFactory;
 
+
+    const ON_TIME = 1;
+    const LATE = 2;
+    const ABSENT = 3;
+    const PERMISSION = 4;
+
     protected $guarded = [];
 
     public function pegawai()
@@ -24,13 +30,33 @@ class Attende extends Model
         return $this->belongsTo(AttendeCode::class, 'attende_code_id', 'id');
     }
 
-    public function status()
+    public function status_kehadiran()
     {
         return $this->belongsTo(AttendeStatus::class, 'attende_status_id', 'id');
     }
 
     public function scopeToday($query)
     {
-        return $query->where('created_at', today());
+        return $query->whereDate('created_at', today());
+    }
+
+    public function scopeHadir($query)
+    {
+        return $query->where('attende_status_id', self::ON_TIME);
+    }
+
+    public function scopeTerlambat($query)
+    {
+        return $query->where('attende_status_id', self::LATE);
+    }
+
+    public function scopeAbsen($query)
+    {
+        return $query->where('attende_status_id', self::ABSENT);
+    }
+
+    public function scopeIzin($query)
+    {
+        return $query->where('attende_status_id', self::PERMISSION);
     }
 }

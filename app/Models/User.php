@@ -4,8 +4,9 @@ namespace App\Models;
 
 use App\Models\Gender;
 use App\Models\Attende;
-use App\Models\Licensing;
 use App\Models\Department;
+use App\Models\AbsentPermission;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     protected $guarded = [];
 
@@ -49,10 +50,10 @@ class User extends Authenticatable
 
     public function izin()
     {
-        return $this->hasMany(Licensing::class, 'user_id', 'local_key');
+        return $this->hasMany(AbsentPermission::class, 'user_id', 'id');
     }
 
-    public function absensi()
+    public function presensi()
     {
         return $this->hasMany(Attende::class, 'user_id', 'id');
     }
@@ -65,5 +66,34 @@ class User extends Authenticatable
     public function scopeWanita($query)
     {
         return $query->where('gender_id', 2);
+    }
+
+    public function scopePns($query)
+    {
+        return $query->where('status', 'PNS');
+    }
+
+    public function scopeHonorer($query)
+    {
+        return $query->where('status', 'Honorer');
+    }
+
+    public function format()
+    {
+        return [
+            'nip' => $this->nip,
+            'name' => $this->name,
+            'department' => $this->departemen->name,
+            'position' => $this->position,
+            'presensi' =>
+            $this->presensi()->with('status_kehadiran')->today()->get()->map(function ($presensi) {
+                // dd($presensi);
+                return [
+                    'status' => $presensi->status_kehadiran->name,
+                    'jam_absen' => $presensi->attende_time == null ? "Belum Ada" : $presensi->attende_time->format('H:i')
+                ];
+            })
+
+        ];
     }
 }
