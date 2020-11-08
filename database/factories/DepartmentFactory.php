@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Department;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class DepartmentFactory extends Factory
@@ -22,7 +23,8 @@ class DepartmentFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->jobTitle,
+            'slug' => Str::slug($this->faker->jobTitle)
         ];
     }
 }

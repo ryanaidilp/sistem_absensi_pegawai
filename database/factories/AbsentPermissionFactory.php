@@ -2,17 +2,17 @@
 
 namespace Database\Factories;
 
-use App\Models\Licensing;
+use App\Models\AbsentPermission;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class LicensingFactory extends Factory
+class AbsentPermissionFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Licensing::class;
+    protected $model = AbsentPermission::class;
 
     /**
      * Define the model's default state.

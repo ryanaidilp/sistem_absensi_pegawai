@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\AttendeCode;
+use App\Models\AttendeType;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class AttendeTypeSeeder extends Seeder
@@ -19,5 +22,14 @@ class AttendeTypeSeeder extends Seeder
             'Absen Masuk Siang',
             'Absen Pulang'
         ];
+
+        foreach ($data as $type) {
+            AttendeType::create(
+                [
+                    'name' => $type,
+                    'slug' => Str::slug($type)
+                ]
+            );
+        }
     }
 }

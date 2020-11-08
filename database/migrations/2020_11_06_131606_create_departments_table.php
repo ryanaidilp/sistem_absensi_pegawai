@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLicensingsTable extends Migration
+class CreateDepartmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateLicensingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('licensings', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->references('id')->on('users');
-            $table->text('description');
-            $table->boolean('is_approved');
-            $table->dateTime('due_date');
+            $table->string('name');
+            $table->string('slug');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateLicensingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('licensings');
+        Schema::dropIfExists('departments');
     }
 }

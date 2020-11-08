@@ -22,7 +22,7 @@ class AttendeCodeFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'code' => $this->faker->unique()->strings,
         ];
     }
 }
