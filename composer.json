@@ -17,6 +17,7 @@
         "laravel/sanctum": "^2.8",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.1",
+        "simplesoftwareio/simple-qrcode": "^4.1",
         "spatie/laravel-fractal": "^5.8",
         "tightenco/ziggy": "^0.9.4"
     },
@@ -24,6 +25,7 @@
         "barryvdh/laravel-debugbar": "^3.5",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
+        "jeroenzwart/laravel-csv-seeder": "^1.4",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3.3"
@@ -53,6 +55,9 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
+        "pre-install-cmd": [
+            "Composer\\Config::disableProcessTimeout"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
@@ -68,6 +73,10 @@
         "packagist": {
             "type": "composer",
             "url": "https://repo.packagist.org"
+        },
+        "hooks": {
+            "type": "composer",
+            "url": "https://larapack.io"
         }
     }
 }
