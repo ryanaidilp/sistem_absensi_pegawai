@@ -18,7 +18,7 @@ Route::get('/', [App\Http\Controllers\MainController::class, 'index'])->name('la
 Route::get('/cetak', [App\Http\Controllers\MainController::class, 'export'])->name('print');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Auth::routes();
+// Auth::routes();
 
 
 Route::group(['prefix' => 'admin'], function () {
