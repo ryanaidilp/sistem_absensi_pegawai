@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends \TCG\Voyager\Models\User
 {
     use HasFactory, Notifiable, HasApiTokens;
 
@@ -90,7 +90,7 @@ class User extends Authenticatable
                 // dd($presensi);
                 return [
                     'status' => $presensi->status_kehadiran->name,
-                    'jam_absen' => $presensi->attende_time == null ? "Belum Ada" : $presensi->attende_time->format('H:i')
+                    'jam_absen' => $presensi->attende_time == null ? "-" : $presensi->attende_time->format('H:i')
                 ];
             })
 
