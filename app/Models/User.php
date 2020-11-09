@@ -6,6 +6,7 @@ use App\Models\Gender;
 use App\Models\Attende;
 use App\Models\Department;
 use App\Models\AbsentPermission;
+use Carbon\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -40,7 +41,7 @@ class User extends \TCG\Voyager\Models\User
 
     public function gender()
     {
-        return $this->hasOne(Gender::class, 'gender_id', 'id');
+        return $this->belongsTo(Gender::class, 'gender_id', 'id');
     }
 
     public function departemen()
@@ -90,7 +91,7 @@ class User extends \TCG\Voyager\Models\User
                 // dd($presensi);
                 return [
                     'status' => $presensi->status_kehadiran->name,
-                    'jam_absen' => $presensi->attende_time == null ? "-" : $presensi->attende_time->format('H:i')
+                    'attend_time' => $presensi->attend_time == null ? "-" : Carbon::parse($presensi->attend_time)->format('H:i')
                 ];
             })
 
