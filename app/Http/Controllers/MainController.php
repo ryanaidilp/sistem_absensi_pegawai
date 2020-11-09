@@ -17,11 +17,8 @@ class MainController extends Controller
         $absent = null;
         $weekend = today()->isWeekend();
         if (!$weekend) {
-            if (today()->dayName === "Jumat") {
-                $deadline = Carbon::parse("07:30")->addDay();
-            } else {
-                $deadline = Carbon::parse("07:30");
-            }
+            $day = today()->isFriday() ? 3 : 1;
+            $deadline = $this->setTimer($day, $attendeCode);
         } else {
             $days = [
                 'Sabtu' => 2,
@@ -70,5 +67,19 @@ class MainController extends Controller
             }),
             'date' => today()->translatedFormat("l, d F Y")
         ]);
+    }
+
+    private function setTimer($days, $attendeCode)
+    {
+        if (now()->format('H') < 6) {
+            $deadline = Carbon::parse($attendeCode[0]->start_time);
+        } else if (now()->format('H') < 12) {
+            $deadline = Carbon::parse($attendeCode[1]->start_time);
+        } else if (now()->format('H') < 18) {
+            $deadline = Carbon::parse($attendeCode[3]->start_time);
+        } else {
+            $deadline = Carbon::parse("07:30")->addDays($days);
+        }
+        return $deadline;
     }
 }
