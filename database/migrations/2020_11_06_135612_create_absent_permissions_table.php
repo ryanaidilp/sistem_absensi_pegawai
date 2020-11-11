@@ -20,6 +20,7 @@ class CreateAbsentPermissionsTable extends Migration
             $table->text('description');
             $table->boolean('is_approved')->default(0);
             $table->string('photo');
+            $table->dateTime('start_date');
             $table->dateTime('due_date');
             $table->timestamps();
         });

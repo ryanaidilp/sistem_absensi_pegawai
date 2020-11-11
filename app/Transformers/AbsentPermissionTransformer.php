@@ -33,8 +33,10 @@ class AbsentPermissionTransformer extends TransformerAbstract
     public function transform(AbsentPermission $permission)
     {
         return [
+            'title' => $permission->title,
             'description' => $permission->description,
-            'is_approved' => $permission->is_approved,
+            'is_approved' => $permission->is_approved ? true : false,
+            'start_date' => $permission->start_date,
             'due_date' => $permission->due_date,
             'photo' => $permission->photo
         ];
