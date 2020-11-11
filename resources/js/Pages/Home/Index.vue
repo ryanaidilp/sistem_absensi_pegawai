@@ -1,5 +1,7 @@
 <template>
-  <div class="container p-4 align-middle d-flex justify-content-center flex-column">
+  <div
+    class="p-4 align-middle d-flex justify-content-center flex-column"
+  >
     <h1 class="text-center font-weight-bold">
       Sistem Presensi Online
       <br />
@@ -13,7 +15,11 @@
         v-if="code != null"
         class="mt-2 justify-content-center d-flex flex-column container-md"
       >
-        <flip-countdown style="width: 60%" :labels="labels" :deadline="formattedTime" />
+        <flip-countdown
+          @timeElapsed="refreshPage()"
+          :labels="labels"
+          :deadline="formattedTime"
+        />
         <p class="text-center h5 text-muted">
           <span class="text-uppercase text-dark font-weight-bold">{{
             code.type
@@ -34,7 +40,11 @@
         v-else
       >
         <p class="text-center h5 text-muted">Presensi selanjutnya</p>
-        <flip-countdown :labels="labels" :deadline="formattedTime" />
+        <flip-countdown
+          @timeElapsed="refreshPage()"
+          :labels="labels"
+          :deadline="formattedTime"
+        />
         <img
           :src="route('landing') + 'assets/images/not_found_placeholder.png'"
           style="width: 30%; display: block"
@@ -55,7 +65,11 @@
       v-else
     >
       <p class="text-center h5 text-muted">Hari kerja selanjutnya</p>
-      <flip-countdown :labels="labels" :deadline="formattedTime" />
+      <flip-countdown
+        @timeElapsed="refreshPage()"
+        :labels="labels"
+        :deadline="formattedTime"
+      />
       <img
         style="width: 30%"
         :src="route('landing') + 'assets/images/weekend_placeholder.png'"
@@ -104,14 +118,17 @@ export default {
     },
   },
   methods: {
-    relfreshPage() {
+    refreshPage() {
+      Inertia.reload({ only: ["code", "deadline", "weekend"] });
+    },
+    updater() {
       setInterval(() => {
-        Inertia.reload({ only: ["code"] });
+        this.refreshPage();
       }, 60 * 1000);
     },
   },
   mounted() {
-    this.relfreshPage();
+    this.updater()
   },
 };
 </script>
