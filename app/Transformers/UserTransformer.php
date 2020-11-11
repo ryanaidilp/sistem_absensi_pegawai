@@ -63,6 +63,6 @@ class UserTransformer extends TransformerAbstract
 
     public function includePresence(User $user)
     {
-        return $this->collection($user->presensi()->latest()->get(), new AttendeTransformers);
+        return $this->collection($user->presensi()->today()->get(), new AttendeTransformers);
     }
 }
