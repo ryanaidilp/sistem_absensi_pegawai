@@ -23,7 +23,7 @@ class UserTransformer extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        'permissions', 'presence',
+        'presence',
     ];
 
     /**
@@ -56,10 +56,6 @@ class UserTransformer extends TransformerAbstract
         ];
     }
 
-    public function includePermissions(User $user)
-    {
-        return $this->collection($user->izin, new AbsentPermissionTransformer);
-    }
 
     public function includePresence(User $user)
     {
