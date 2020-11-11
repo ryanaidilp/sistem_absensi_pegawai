@@ -79,7 +79,7 @@ class User extends \TCG\Voyager\Models\User
         return $query->where('status', 'Honorer');
     }
 
-    public function format()
+    public function format($date)
     {
         return [
             'nip' => $this->nip,
@@ -87,7 +87,7 @@ class User extends \TCG\Voyager\Models\User
             'department' => $this->departemen->name,
             'position' => $this->position,
             'presensi' =>
-            $this->presensi()->with('status_kehadiran')->today()->get()->map(function ($presensi) {
+            $this->presensi()->with('status_kehadiran')->whereDate('created_at', $date)->get()->map(function ($presensi) {
                 // dd($presensi);
                 return [
                     'status' => $presensi->status_kehadiran->name,
