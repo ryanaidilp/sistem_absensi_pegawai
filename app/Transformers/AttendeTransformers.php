@@ -35,15 +35,18 @@ class AttendeTransformers extends TransformerAbstract
     {
         $time = !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "";
         return [
-            'date' =>  $attende->created_at->format('d-m-Y'),
+            'date' =>  $attende->created_at->format('Y-m-d'),
             'code_type' => $attende->kode_absen->tipe->name,
             'status' => $attende->status_kehadiran->name,
             'attend_time' => $time,
+            'start_time' => Carbon::parse($attende->kode_absen->start_time)->format('Y-m-d H:i:s'),
+            'end_time' => Carbon::parse($attende->kode_absen->end_time)->format('Y-m-d H:i:s'),
             'location' => [
-                'latitude' => $attende->latitude,
-                'longitude' => $attende->longitude,
+                'latitude' => (float) $attende->latitude,
+                'longitude' => (float) $attende->longitude,
+                'address' => $attende->address ?? ""
             ],
-            'photo' => $attende->photo
+            'photo' => $attende->photo ?? ""
 
         ];
     }
