@@ -45,7 +45,7 @@ class GenerateAttendeCommand extends Command
         foreach ($codes as $code) {
             foreach ($users as $user) {
                 $status = Attende::ABSENT;
-                $permit = $user->izin()->whereDate('due_date', '>=', today())->first();
+                $permit = $user->izin()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
                 if (!is_null($permit) && $permit->is_approved) {
                     $status = Attende::PERMISSION;
                 }
