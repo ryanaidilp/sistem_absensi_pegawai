@@ -33,14 +33,14 @@ class AllUserTransformers extends TransformerAbstract
     public function transform(User $user)
     {
         return [
-            'nip' => $user->nip,
+            'nip' => $user->nip ?? "",
             'name' => $user->name,
             'gender' => $user->gender->name,
             'status' => $user->status,
             'department' => $user->departemen->name,
             'position' => $user->position,
-            'phone' => $user->phone,
-            'email' => $user->email,
+            'phone' => $user->phone ?? "",
+            'email' => $user->email ?? "",
         ];
     }
 }
