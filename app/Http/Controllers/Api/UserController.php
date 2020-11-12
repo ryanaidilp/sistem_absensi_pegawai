@@ -14,7 +14,6 @@ use App\Transformers\AttendeTransformers;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Transformers\UserTransformer;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -192,12 +191,12 @@ class UserController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        if (Carbon::parse($request->due_date) <= now()) {
-            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat izin tertanggal setelah hari ini.']]);
+        if (Carbon::parse($request->due_date) < today()) {
+            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat izin tertanggal hari ini.']]);
         }
 
         $realImage = base64_decode($request->photo);
-        $imageName = $request->title . "-" . now()->translatedFormat('l, d m Y') . "-" . $request->file_name;
+        $imageName = $request->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
 
         Storage::disk('public')->put("izin/" . $request->user()->name . "/"   . $imageName,  $realImage);
 
@@ -212,6 +211,14 @@ class UserController extends Controller
         ]);
 
         if ($permission) {
+            if (Carbon::parse($request->start_date)->isToday()) {
+                $presences = $request->user()->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
+                foreach ($presences as $presence) {
+                    $presence->update([
+                        'attende_status_id' => Attende::PERMISSION
+                    ]);
+                }
+            }
             return setJson(
                 true,
                 'Berhasil',
