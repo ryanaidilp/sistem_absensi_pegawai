@@ -17,11 +17,8 @@ class MainController extends Controller
         $absent = null;
         $weekend = today()->isWeekend();
         if (!$weekend) {
-            if (today()->dayName === "Jumat") {
-                $deadline = Carbon::parse("07:30")->addDay();
-            } else {
-                $deadline = Carbon::parse("07:30");
-            }
+            $day = today()->isFriday() ? 3 : 1;
+            $deadline = $this->setTimer($day, $attendeCode);
         } else {
             $days = [
                 'Sabtu' => 2,
@@ -57,18 +54,34 @@ class MainController extends Controller
         ]);
     }
 
-    public function export()
+    public function export(Request $request)
     {
+        $date = ($request->date) ? Carbon::parse($request->date) : today();
         $pns = User::with(['presensi', 'departemen'])->pns()->get();
         $honorer = User::with(['presensi', 'departemen'])->honorer()->get();
         return Inertia::render('Table/Index', [
-            'pns' => $pns->map(function ($pegawai) {
-                return $pegawai->format();
+            'pns' => $pns->map(function ($pegawai) use ($date) {
+                return $pegawai->format($date);
             }),
-            'honorer' => $honorer->map(function ($pegawai) {
-                return $pegawai->format();
+            'honorer' => $honorer->map(function ($pegawai) use ($date) {
+                return $pegawai->format($date);
             }),
-            'date' => today()->translatedFormat("l, d F Y")
+            'date' => $date->translatedFormat("l, d F Y")
         ]);
+    }
+
+    private function setTimer($days, $attendeCode)
+    {
+
+        if (now()->hour >= 8 && now()->hour < 12) {
+            $deadline = Carbon::parse($attendeCode[1]->start_time);
+        } else if (now()->hour >= 12 && now()->hour < 18) {
+            $deadline = Carbon::parse($attendeCode[3]->start_time);
+        } else if (now()->hour >= 0 && now()->hour < 8) {
+            $deadline = Carbon::parse("07:30");
+        } else {
+            $deadline = Carbon::parse("07:30")->addDays($days);
+        }
+        return $deadline;
     }
 }

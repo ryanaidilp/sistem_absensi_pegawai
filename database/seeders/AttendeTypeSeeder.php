@@ -17,9 +17,9 @@ class AttendeTypeSeeder extends Seeder
     public function run()
     {
         $data = [
-            'Absen Hadir',
+            'Absen Pagi',
             'Absen Istrahat',
-            'Absen Masuk Siang',
+            'Absen Siang',
             'Absen Pulang'
         ];
 

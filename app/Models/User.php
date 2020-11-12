@@ -6,13 +6,14 @@ use App\Models\Gender;
 use App\Models\Attende;
 use App\Models\Department;
 use App\Models\AbsentPermission;
+use Carbon\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class User extends \TCG\Voyager\Models\User
 {
     use HasFactory, Notifiable, HasApiTokens;
 
@@ -40,7 +41,7 @@ class User extends Authenticatable
 
     public function gender()
     {
-        return $this->hasOne(Gender::class, 'gender_id', 'id');
+        return $this->belongsTo(Gender::class, 'gender_id', 'id');
     }
 
     public function departemen()
@@ -78,7 +79,7 @@ class User extends Authenticatable
         return $query->where('status', 'Honorer');
     }
 
-    public function format()
+    public function format($date)
     {
         return [
             'nip' => $this->nip,
@@ -86,11 +87,11 @@ class User extends Authenticatable
             'department' => $this->departemen->name,
             'position' => $this->position,
             'presensi' =>
-            $this->presensi()->with('status_kehadiran')->today()->get()->map(function ($presensi) {
+            $this->presensi()->with('status_kehadiran')->whereDate('created_at', $date)->get()->map(function ($presensi) {
                 // dd($presensi);
                 return [
                     'status' => $presensi->status_kehadiran->name,
-                    'jam_absen' => $presensi->attende_time == null ? "Belum Ada" : $presensi->attende_time->format('H:i')
+                    'attend_time' => $presensi->attend_time == null ? "-" : Carbon::parse($presensi->attend_time)->format('H:i')
                 ];
             })
 

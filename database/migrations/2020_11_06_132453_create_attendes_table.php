@@ -21,7 +21,8 @@ class CreateAttendesTable extends Migration
             $table->datetime('attend_time')->nullable();
             $table->float('latitude')->default(0);
             $table->float('longitude')->default(0);
-            $table->string('photo')->nullable();
+            $table->text('address')->nullable();
+            $table->text('photo')->nullable();
             $table->timestamps();
         });
     }

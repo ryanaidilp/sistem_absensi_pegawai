@@ -16,8 +16,11 @@ class CreateAbsentPermissionsTable extends Migration
         Schema::create('absent_permissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->references('id')->on('users');
+            $table->string('title');
             $table->text('description');
-            $table->boolean('is_approved');
+            $table->boolean('is_approved')->default(0);
+            $table->string('photo');
+            $table->dateTime('start_date');
             $table->dateTime('due_date');
             $table->timestamps();
         });
