@@ -211,14 +211,6 @@ class UserController extends Controller
         ]);
 
         if ($permission) {
-            if (Carbon::parse($request->start_date)->isToday()) {
-                $presences = $request->user()->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
-                foreach ($presences as $presence) {
-                    $presence->update([
-                        'attende_status_id' => Attende::PERMISSION
-                    ]);
-                }
-            }
             return setJson(
                 true,
                 'Berhasil',

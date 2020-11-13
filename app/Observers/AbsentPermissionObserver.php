@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\AbsentPermission;
 use App\Models\Attende;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class AbsentPermissionObserver
@@ -16,7 +17,14 @@ class AbsentPermissionObserver
      */
     public function created(AbsentPermission $absentPermission)
     {
-        //
+        if (Carbon::parse($absentPermission->start_date)->isToday()) {
+            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
+            foreach ($presences as $presence) {
+                $presence->update([
+                    'attende_status_id' => Attende::PERMISSION
+                ]);
+            }
+        }
     }
 
     /**
