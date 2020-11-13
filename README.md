@@ -7,6 +7,7 @@ Sistem Absensi Pegawai (SIAP)
 Website berisi *API Backend* dan manajemen data pegawai untuk aplikasi **[SIAP]()**. Website ini dibangun dengan [Laravel](https://laravel.com), [Bootstrap](https://getbootstrap.com), [Vue JS](https://vuejs.org), dan [Inertia JS](https://inertiajs.com). Website ini juga memiliki halaman absensi (QR Code) dan tabel untuk menampilkan data kehadiran pegawai.
 
 <p align="center">
+<img src="https://i.ibb.co/rGYjC8F/image.png"/>
 <img src="https://i.ibb.co/DYkXdzM/Untitled-1.jpg"/>
 </p>
 
