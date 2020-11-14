@@ -37,14 +37,14 @@ class Kernel extends ConsoleKernel
         $schedule->command('cache:clear')->dailyAt('00:50');
         $schedule->command('view:clear')->dailyAt('00:50');
         $schedule->command('debugbar:clear')->dailyAt('00:50');
-        $schedule->command('absent:code')->dailyAt('01:00')
+        $schedule->command('absent:code')->weekdays()->at('01:00')
             ->onSuccess(function () {
                 Log::info('code_generated_successfully');
             })
             ->onFailure(function () {
                 Log::info('failed_to_generate_code');
             });
-        $schedule->command('absent:attende')->dailyAt('01:05')
+        $schedule->command('absent:attende')->weekdays()->at('01:05')
             ->onSuccess(function () {
                 Log::info('attende_list_generated_successfully');
             })
