@@ -52,7 +52,7 @@ class UserTransformer extends TransformerAbstract
             'status' => $user->status,
             'position' => $user->position,
             'token' => $this->token,
-            'next_presence' => $this->nextPresence ? fractal()->item($this->nextPresence)->transformWith(new AttendeTransformers) : []
+            'next_presence' => $this->nextPresence ? fractal()->item($this->nextPresence)->transformWith(new AttendeTransformers) : null
         ];
     }
 
