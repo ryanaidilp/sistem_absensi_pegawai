@@ -144,14 +144,14 @@ class UserController extends Controller
 
 
         $realImage = base64_decode($request->photo);
-        $imageName = $request->user()->name . "-" . $request->file_name;
+        $imageName = now()->format('d_m_Y') . "-" . $request->file_name;
 
-        Storage::disk('public')->put("presensi/" . now()->format('d_m_Y') . "/" . $code->tipe->name . "/$imageName",  $realImage);
+        Storage::disk('public')->put("presensi/" . $request->user()->name . "/" . $code->tipe->name . "/$imageName",  $realImage);
 
         $update = $attende->update([
             'attend_time' => now(),
             'attende_status_id' => $status,
-            'photo' => "presensi/" . now()->format('d_m_Y') . "/" . $code->tipe->name . "/$imageName",
+            'photo' => "presensi/" . $request->user()->name  . "/" . $code->tipe->name . "/$imageName",
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'address' => $request->address
