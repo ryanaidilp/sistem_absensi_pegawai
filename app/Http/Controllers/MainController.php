@@ -75,7 +75,9 @@ class MainController extends Controller
 
         if (now()->hour >= 8 && now()->hour < 12) {
             $deadline = Carbon::parse($attendeCode[1]->start_time);
-        } else if (now()->hour >= 12 && now()->hour < 18) {
+        } else if (now()->hour >= 12 && now()->hour < 13) {
+            $deadline = Carbon::parse($attendeCode[2]->start_time);
+        } else if (now()->hour >= 13 && now()->hour < 18) {
             $deadline = Carbon::parse($attendeCode[3]->start_time);
         } else if (now()->hour >= 0 && now()->hour < 8) {
             $deadline = Carbon::parse("07:30");
