@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2e05f4dfb1b041bffcdcdf5db15cae6",
+    "content-hash": "d6bf2fa5d27104d5b34aa746b3e64b55",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -236,6 +236,60 @@
                 }
             ],
             "time": "2020-08-18T23:57:15+00:00"
+        },
+        {
+            "name": "calendarific/php-calendarific",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/calendarific/php-calendarific.git",
+                "reference": "a6741ae6224e3df83f2e75791269ea3aeca9d9e1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/calendarific/php-calendarific/zipball/a6741ae6224e3df83f2e75791269ea3aeca9d9e1",
+                "reference": "a6741ae6224e3df83f2e75791269ea3aeca9d9e1",
+                "shasum": ""
+            },
+            "require": {
+                "jedkirby/json": "0.1.0",
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Calendarific\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Calendarific Team",
+                    "email": "hello@calendarific.com",
+                    "homepage": "https://calendarific.com"
+                }
+            ],
+            "description": "PHP library for Calendarific.com",
+            "homepage": "https://calendarific.com",
+            "keywords": [
+                "calendar",
+                "calendarific",
+                "calendarindex",
+                "date",
+                "holiday",
+                "holidays"
+            ],
+            "support": {
+                "issues": "https://github.com/calendarific/php-calendarific/issues",
+                "source": "https://github.com/calendarific/php-calendarific/tree/2.0.0"
+            },
+            "time": "2019-05-30T18:10:33+00:00"
         },
         {
             "name": "composer/ca-bundle",
@@ -1886,6 +1940,45 @@
                 "source": "https://github.com/Intervention/image/tree/master"
             },
             "time": "2019-11-02T09:15:47+00:00"
+        },
+        {
+            "name": "jedkirby/json",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jedkirby/json.git",
+                "reference": "51df6cc9f38a38bb700146cda593b0eb52fd6efd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jedkirby/json/zipball/51df6cc9f38a38bb700146cda593b0eb52fd6efd",
+                "reference": "51df6cc9f38a38bb700146cda593b0eb52fd6efd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "Jedkirby\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "keywords": [
+                "json"
+            ],
+            "support": {
+                "issues": "https://github.com/jedkirby/json/issues",
+                "source": "https://github.com/jedkirby/json/tree/0.1.0"
+            },
+            "time": "2019-04-17T15:37:39+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
