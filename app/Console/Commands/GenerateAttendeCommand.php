@@ -42,21 +42,25 @@ class GenerateAttendeCommand extends Command
     {
         $users = User::pns()->orWhere->honorer()->get();
         $codes = AttendeCode::whereDate('created_at', today())->get();
-        foreach ($codes as $code) {
-            foreach ($users as $user) {
-                $status = Attende::ABSENT;
-                $permit = $user->izin()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
-                if (!is_null($permit) && $permit->is_approved) {
-                    $status = Attende::PERMISSION;
+        if ($codes->count() > 0) {
+            foreach ($codes as $code) {
+                foreach ($users as $user) {
+                    $status = Attende::ABSENT;
+                    $permit = $user->izin()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
+                    if (!is_null($permit) && $permit->is_approved) {
+                        $status = Attende::PERMISSION;
+                    }
+                    Attende::create([
+                        'user_id' => $user->id,
+                        'attende_code_id' => $code->id,
+                        'attende_status_id' => $status,
+                    ]);
                 }
-                Attende::create([
-                    'user_id' => $user->id,
-                    'attende_code_id' => $code->id,
-                    'attende_status_id' => $status,
-                ]);
             }
+            $this->info('Attende list generated successfully!');
+        } else {
+            $this->info('No attende code for today!');
         }
-        $this->info('Attende list generated successfully!');
         return 0;
     }
 }
