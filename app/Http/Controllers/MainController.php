@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendeCode;
+use App\Models\Holiday;
 use App\Models\User;
 use Carbon\Carbon;
+use DateInterval;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
@@ -16,7 +18,17 @@ class MainController extends Controller
         $attendeCode = AttendeCode::with(['tipe'])->whereDate('created_at', today())->get();
         $absent = null;
         $weekend = today()->isWeekend();
-        if (!$weekend) {
+        $holiday = Holiday::whereDate('date', today())->first();
+
+        $holiday = (object) [
+            'is_holiday' => !is_null($holiday),
+            'name' =>  optional($holiday)->name ?? '',
+            'date' => optional($holiday)->date ?? ''
+        ];
+
+        if ($holiday->is_holiday) {
+            $deadline = null;
+        } else if (!$weekend) {
             $day = today()->isFriday() ? 3 : 1;
             $deadline = $this->setTimer($day, $attendeCode);
         } else {
@@ -26,6 +38,7 @@ class MainController extends Controller
             ][today()->dayName];
             $deadline = Carbon::parse('07:30')->addDays($days);
         }
+
         foreach ($attendeCode as $code) {
 
             if (
@@ -50,7 +63,8 @@ class MainController extends Controller
         return Inertia::render('Home/Index', [
             'code' => $absent,
             'weekend' => $weekend,
-            'deadline' => $deadline
+            'deadline' => $deadline,
+            'holiday' => $holiday
         ]);
     }
 

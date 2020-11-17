@@ -8,7 +8,21 @@
       Pegawai Kantor Camat Balaesang
     </h1>
     <div
-      v-if="!weekend"
+      class="mt-4 justify-content-center d-flex flex-column container-md"
+      v-if="holiday.is_holiday"
+    >
+      <p class="text-center h5 text-muted">Libur Nasional</p>
+      <br>
+      <p class="text-center">{{ holiday.name }}</p>
+      <img
+        style="width: 30%"
+        :src="route('landing') + 'assets/images/weekend_placeholder.png'"
+        class="ml-auto mr-auto img d-block img-fluid"
+      />
+      <p class="text-center">Tidak ada jadwal kantor hari ini</p>
+    </div>
+    <div
+      v-else-if="!weekend"
       class="justify-content-center d-flex flex-column container-md"
     >
       <div
@@ -98,6 +112,10 @@ export default {
       type: String,
       default: () => "",
     },
+    holiday: {
+      type: Object,
+      default: () => {}
+    }
   },
   data() {
     return {
