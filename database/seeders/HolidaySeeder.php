@@ -19,7 +19,11 @@ class HolidaySeeder extends Seeder
         $dates = Calendarific::make(
             env('CALENDARIFIC_KEY'),
             'ID',
-            '2020',
+            2021,
+            null,
+            null,
+            null,
+            ['national']
         );
 
         foreach ($dates['response']['holidays'] as $holiday) {
