@@ -23,11 +23,11 @@
         "sass-loader": "^8.0.0",
         "vue": "^2.5.17",
         "vue-template-compiler": "^2.6.10",
-        "vue2-datepicker": "^3.7.0",
+        "vue2-datepicker": "^3.8.0",
         "vue2-flip-countdown": "^0.11.1"
     },
     "dependencies": {
-        "@inertiajs/inertia": "^0.6.2",
+        "@inertiajs/inertia": "^0.6.3",
         "@inertiajs/inertia-vue": "^0.4.2",
         "@inertiajs/progress": "^0.2.2",
         "portal-vue": "^2.1.7"
