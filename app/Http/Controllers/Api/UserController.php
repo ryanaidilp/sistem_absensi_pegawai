@@ -14,6 +14,7 @@ use App\Transformers\AttendeTransformers;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Transformers\UserTransformer;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -195,25 +196,31 @@ class UserController extends Controller
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat izin tertanggal hari ini.']]);
         }
 
-        $permissions = AbsentPermission::whereYear('start_date', now()->year)->where('user_id', request()->user()->id)->get();
+        if (!Str::contains($request->title, 'Lapangan')) {
+            $permissions = AbsentPermission::whereYear('start_date', now()->year)
+                ->where([
+                    ['user_id', request()->user()->id],
+                    ['title', 'not like', '%Lapangan%']
+                ])->get();
 
 
-        $startDate = Carbon::parse($request->start_date);
-        $dueDate = Carbon::parse($request->due_date);
-        $totalDay = $startDate->diffInDays($dueDate);
+            $startDate = Carbon::parse($request->start_date);
+            $dueDate = Carbon::parse($request->due_date);
+            $totalDay = $startDate->diffInDays($dueDate);
 
-        if ($permissions->count() > 0) {
-            foreach ($permissions as $permission) {
-                $startDate = Carbon::parse($permission->start_date);
-                $dueDate = Carbon::parse($permission->due_date);
-                $diff = $startDate->diffInDays($dueDate);
-                $diff = $diff == 0 ? 1 : $diff;
-                $totalDay += $diff;
+            if ($permissions->count() > 0) {
+                foreach ($permissions as $permission) {
+                    $startDate = Carbon::parse($permission->start_date);
+                    $dueDate = Carbon::parse($permission->due_date);
+                    $diff = $startDate->diffInDays($dueDate);
+                    $diff = $diff == 0 ? 1 : $diff;
+                    $totalDay += $diff;
+                }
             }
-        }
 
-        if ($totalDay > 12) {
-            return setJson(false, 'Pelanggaran', [], 400, ['tanggal_kadaluarsa' => ['Izin tidak boleh lebih dari 12 hari dalam satu tahun.']]);
+            if ($totalDay > 12) {
+                return setJson(false, 'Pelanggaran', [], 400, ['tanggal_kadaluarsa' => ['Izin tidak boleh lebih dari 12 hari dalam satu tahun.']]);
+            }
         }
 
         $realImage = base64_decode($request->photo);
