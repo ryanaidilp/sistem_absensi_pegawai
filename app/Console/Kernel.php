@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Console\Commands\CreateAbsentCodeCommand;
 use App\Console\Commands\GenerateAttendeCommand;
+use App\Console\Commands\GenerateHolidays;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -23,6 +24,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         CreateAbsentCodeCommand::class,
         GenerateAttendeCommand::class,
+        GenerateHolidays::class
     ];
 
     /**
@@ -51,6 +53,7 @@ class Kernel extends ConsoleKernel
             ->onFailure(function () {
                 Log::info('failed_to_generate_attende_list');
             });
+        $schedule->command('holiday:generate')->yearlyOn(12, 31, '18:00');
     }
 
     /**
