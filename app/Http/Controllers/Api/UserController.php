@@ -400,13 +400,13 @@ class UserController extends Controller
             $nextPresence = null;
         } else if (!$weekend) {
             if (now()->hour >= 8 && now()->hour < 12) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[1]]])->first();
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[1]->id]])->first();
             } else if (now()->hour >= 12 && now()->hour < 13) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[2]]])->first();
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[2]->id]])->first();
             } else if (now()->hour >= 13 && now()->hour < 18) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[3]]])->first();
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[3]->id]])->first();
             } else if (now()->hour >= 0 && now()->hour < 8) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[0]]])->first();
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[0]->id]])->first();
             }
         }
 
