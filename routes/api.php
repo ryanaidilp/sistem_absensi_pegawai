@@ -29,4 +29,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('presence', [UserController::class, 'presence']);
     Route::post('permission', [UserController::class, 'createPermission']);
     Route::get('permission', [UserController::class, 'permission']);
+    Route::get('permission/all', [UserController::class, 'allPermissions']);
+    Route::post('permission/approve',  [UserController::class, 'approvePermission']);
 });

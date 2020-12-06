@@ -36,19 +36,26 @@ class AbsentPermissionObserver
     public function updated(AbsentPermission $absentPermission)
     {
         if ($absentPermission->is_approved) {
-            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
-            foreach ($presences as $presence) {
-                $presence->update([
-                    'attende_status_id' => Attende::PERMISSION
-                ]);
-            }
+            $this->updateStatus(Attende::ABSENT, Attende::PERMISSION, $absentPermission);
         } else {
-            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::PERMISSION)->get();
-            foreach ($presences as $presence) {
-                $presence->update([
-                    'attende_status_id' => Attende::ABSENT
-                ]);
-            }
+            $this->updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
+        }
+    }
+
+    private function updateStatus($from, $to, AbsentPermission $absentPermission)
+    {
+        if (Carbon::parse($absentPermission->due_date) < today()) {
+            $presences = $absentPermission->user->presensi()
+                ->whereDate('created_at', '>=', Carbon::parse($absentPermission->start_date)->toDateString())
+                ->whereDate('created_at', '<=',  Carbon::parse($absentPermission->due_date)->toDateString())
+                ->where('attende_status_id', $from)->get();
+        } else {
+            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', $from)->get();
+        }
+        foreach ($presences as $presence) {
+            $presence->update([
+                'attende_status_id' => $to
+            ]);
         }
     }
 

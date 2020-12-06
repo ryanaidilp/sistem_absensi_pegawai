@@ -2,22 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\AbsentPermission;
-use App\Models\Attende;
-use App\Models\AttendeCode;
-use App\Transformers\AbsentPermissionTransformer;
-use App\Transformers\AllUserTransformers;
-use App\Transformers\AttendeTransformers;
-use App\Transformers\Serializers\CustomSerializer;
-use App\Transformers\UserTransformer;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Attende;
+use App\Models\Holiday;
+use App\Models\AttendeCode;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\AbsentPermission;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Transformers\AttendeTransformers;
+use App\Transformers\AllUserTransformers;
+use App\Transformers\AbsentPermissionTransformer;
+use App\Transformers\Serializers\CustomSerializer;
+use App\Transformers\EmployeePermissionTransformer;
 
 class UserController extends Controller
 {
@@ -159,6 +161,10 @@ class UserController extends Controller
         ]);
 
         if ($update) {
+            sendNotification("Presensi berhasil : 
+                \nJenis Presensi : {$attende->kode_absen->tipe->name}
+                \nStatus Kehadiran: {$attende->status_kehadiran->name} 
+                \nJam Presensi : {$attende->attend_time->translatedFormat('H:i:s')}", 'Presensi berhasil!', $request->user()->id);
             return setJson(
                 true,
                 'Sukses melakukan presensi!',
@@ -235,10 +241,12 @@ class UserController extends Controller
             'photo' => "izin/" . $request->user()->name . "/"   . $imageName,
             'due_date' => Carbon::parse($request->due_date),
             'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => false
+            'is_approved' => $request->user()->position === 'Camat' ? true : false
         ]);
 
         if ($permission) {
+            sendNotification('Izin diajukan dan menunggu persetujuan!', 'Izin diajukan!', $request->user()->id);
+            sendNotification("Izin baru diajukan oleh  $request->user()->name : \n$request->title", 'Pengajuan izin!', 2);
             return setJson(
                 true,
                 'Berhasil',
@@ -262,6 +270,49 @@ class UserController extends Controller
 
         return setJson(true, 'Berhasil', $permissions, 200, []);
     }
+
+    public function allPermissions(Request $request)
+    {
+        if ($request->user()->position !== 'Camat') {
+            return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
+        }
+
+        $permissions = AbsentPermission::orderBy('created_at', 'desc')->get();
+        $permissions = fractal()->collection($permissions, new EmployeePermissionTransformer)
+            ->serializeWith(new CustomSerializer)->toArray();
+
+        return setJson(true, 'Berhasil', $permissions, 200, []);
+    }
+
+    public function approvePermission(Request $request)
+    {
+        if ($request->user()->position !== 'Camat') {
+            return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
+        }
+
+        $permission = AbsentPermission::where([
+            ['id', $request->permission_id],
+            ['user_id', $request->user_id]
+        ])->first();
+        $update = $permission->update([
+            'is_approved' => $request->is_approved
+        ]);
+
+        $prefix = $permission->is_approved ? 'disetujui' : 'ditolak!';
+
+        if ($update) {
+            sendNotification("Izin $permission->title anda telah $prefix pada : " . now()->translatedFormat('d F Y H:i:s'), "Izin $prefix!", $permission->user_id);
+            return setJson(
+                true,
+                'Sukses mengubah status izin!',
+                fractal()->item($permission)->transformWith(new EmployeePermissionTransformer)->serializeWith(new CustomSerializer),
+                200,
+                []
+            );
+        }
+        return setJson(false, 'Gagal', [], 400, ['message' => ['Kesalahan tidak diketahui!']]);
+    }
+
 
     /**
      * Display the specified resource.
@@ -334,48 +385,45 @@ class UserController extends Controller
     private function checkNextPresence($userId)
     {
         $attendeCode = AttendeCode::with(['tipe'])->whereDate('created_at', today())->get();
+        $weekend = today()->isWeekend();
+        $holiday = Holiday::whereDate('date', today())->first();
 
         $nextPresence = null;
 
-        for ($i = 0; $i < $attendeCode->count(); $i++) {
-            if (Carbon::parse($attendeCode[$i]->start_time) <= now() && Carbon::parse($attendeCode[$i]->end_time) >= now()) {
+        $holiday = (object) [
+            'is_holiday' => !is_null($holiday),
+            'name' =>  optional($holiday)->name ?? '',
+            'date' => optional($holiday)->date ?? ''
+        ];
 
-                $nextPresence = Attende::where(
-                    [
-                        ['attende_code_id', $attendeCode[$i]->id],
-                        ['user_id', $userId]
-                    ]
-                )->first();
-                break;
-            }
-            if ($i + 1 < $attendeCode->count()) {
-                if (Carbon::parse($attendeCode[$i]->end_time) <= now() && Carbon::parse($attendeCode[$i + 1]->start_time) >= now()) {
-                    $nextPresence = Attende::where(
-                        [
-                            ['attende_code_id', $attendeCode[$i + 1]->id],
-                            ['user_id', $userId]
-                        ]
-                    )->first();
-                    break;
-                } else if (now()->format('H') < 9) {
-                    $nextPresence = Attende::where(
-                        [
-                            ['attende_code_id', $attendeCode[0]->id],
-                            ['user_id', $userId]
-                        ]
-                    )->first();
-                    break;
-                } else {
-                    $nextPresence = Attende::where(
-                        [
-                            ['attende_code_id', $attendeCode[3]->id],
-                            ['user_id', $userId]
-                        ]
-                    )->first();
-                    break;
-                }
+        if ($holiday->is_holiday) {
+            $nextPresence = null;
+        } else if (!$weekend) {
+            if (now()->hour >= 8 && now()->hour < 12) {
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[1]]])->first();
+            } else if (now()->hour >= 12 && now()->hour < 13) {
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[2]]])->first();
+            } else if (now()->hour >= 13 && now()->hour < 18) {
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[3]]])->first();
+            } else if (now()->hour >= 0 && now()->hour < 8) {
+                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[0]]])->first();
             }
         }
+
+        foreach ($attendeCode as $code) {
+
+            if (
+                Carbon::parse($code->start_time) <= now()
+                &&
+                Carbon::parse($code->end_time) >= now()
+            ) {
+                $nextPresence = $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $code->id]])->first();;
+                break;
+            }
+        }
+
+
+
         return $nextPresence;
     }
 }
