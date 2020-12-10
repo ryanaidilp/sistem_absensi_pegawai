@@ -12,6 +12,8 @@
     "devDependencies": {
         "axios": "^0.19",
         "bootstrap": "^4.0.0",
+        "chart.js": "^2.9.4",
+        "chartjs-plugin-datalabels": "^0.7.0",
         "cross-env": "^7.0",
         "jquery": "^3.2",
         "laravel-mix": "^5.0.1",
@@ -22,6 +24,7 @@
         "sass": "^1.20.1",
         "sass-loader": "^8.0.0",
         "vue": "^2.5.17",
+        "vue-chartjs": "^3.5.1",
         "vue-template-compiler": "^2.6.10",
         "vue2-datepicker": "^3.8.0",
         "vue2-flip-countdown": "^0.11.1"
