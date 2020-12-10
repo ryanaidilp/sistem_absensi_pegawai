@@ -2,16 +2,13 @@
 
 namespace App\Console;
 
-use App\Models\User;
-use App\Models\Attende;
-use App\Models\AttendeCode;
-use App\Models\AttendeType;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Console\Scheduling\Schedule;
-use App\Console\Commands\CreateAbsentCodeCommand;
-use App\Console\Commands\GenerateAttendeCommand;
 use App\Console\Commands\GenerateHolidays;
+use Illuminate\Console\Scheduling\Schedule;
+use App\Console\Commands\GenerateAttendeCommand;
+use App\Console\Commands\CreateAbsentCodeCommand;
+use App\Console\Commands\NotifyExpiredOutstation;
+use App\Console\Commands\NotifyExpiredPermission;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
@@ -22,9 +19,11 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        CreateAbsentCodeCommand::class,
+        GenerateHolidays::class,
         GenerateAttendeCommand::class,
-        GenerateHolidays::class
+        CreateAbsentCodeCommand::class,
+        NotifyExpiredPermission::class,
+        NotifyExpiredOutstation::class
     ];
 
     /**
@@ -39,6 +38,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('cache:clear')->dailyAt('00:50');
         $schedule->command('view:clear')->dailyAt('00:50');
         $schedule->command('debugbar:clear')->dailyAt('00:50');
+        $schedule->command('permission:check')->dailyAt("01:10");
+        $schedule->command('outstation:check')->dailyAt("01:15");
         $schedule->command('absent:code')->weekdays()->at('01:00')
             ->onSuccess(function () {
                 Log::info('code_generated_successfully');
