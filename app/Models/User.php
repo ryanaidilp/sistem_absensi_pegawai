@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Models\Gender;
 use App\Models\Attende;
+use App\Models\Outstation;
 use App\Models\Department;
 use App\Models\AbsentPermission;
-use Carbon\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -52,6 +53,11 @@ class User extends \TCG\Voyager\Models\User
     public function izin()
     {
         return $this->hasMany(AbsentPermission::class, 'user_id', 'id');
+    }
+
+    public function dinas_luar()
+    {
+        return $this->hasMany(Outstation::class, 'user_id', 'id');
     }
 
     public function presensi()
