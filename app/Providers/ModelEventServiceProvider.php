@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Outstation;
 use App\Models\AbsentPermission;
-use App\Observers\AbsentPermissionObserver;
+use App\Observers\OutstationObserver;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\AbsentPermissionObserver;
 
 class ModelEventServiceProvider extends ServiceProvider
 {
@@ -26,5 +28,6 @@ class ModelEventServiceProvider extends ServiceProvider
     public function boot()
     {
         AbsentPermission::observe(new AbsentPermissionObserver);
+        Outstation::observe(new OutstationObserver);
     }
 }
