@@ -2,9 +2,9 @@
 
 namespace App\Observers;
 
-use App\Models\AbsentPermission;
-use App\Models\Attende;
 use Carbon\Carbon;
+use App\Models\Attende;
+use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Log;
 
 class AbsentPermissionObserver
