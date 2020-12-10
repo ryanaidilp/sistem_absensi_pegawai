@@ -2,6 +2,7 @@
 
 namespace App\Transformers;
 
+use App\Models\Holiday;
 use App\Models\User;
 use App\Transformers\Serializers\CustomSerializer;
 use League\Fractal\TransformerAbstract;
@@ -42,6 +43,13 @@ class UserTransformer extends TransformerAbstract
      */
     public function transform(User $user)
     {
+        $holiday = Holiday::whereDate('date', today())->first();
+        if ($holiday !== null) {
+            $holiday = [
+                'name' => optional($holiday)->name,
+                'date' => optional($holiday)->date
+            ];
+        }
         return [
             'id' => $user->id,
             'nip' => $user->nip,
@@ -49,8 +57,11 @@ class UserTransformer extends TransformerAbstract
             'phone' => $user->phone,
             'gender' => $user->gender->name,
             'department' => $user->departemen->name,
+            'holiday' => $holiday,
+            'is_weekend' => today()->isWeekend(),
             'status' => $user->status,
             'position' => $user->position,
+            'unread_notifications' => $user->unreadNotifications->count(),
             'token' => $this->token,
             'next_presence' => $this->nextPresence ? fractal()->item($this->nextPresence)->transformWith(new AttendeTransformers) : null
         ];
