@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Http;
 
-use function PHPUnit\Framework\isNull;
-
 function setJson($success, $message, $data, $statusCode, $errors = [])
 {
     return response()->json([
@@ -25,7 +23,7 @@ function sendNotification($body, $heading, $userId = null)
     ];
 
 
-    if (!isNull($userId)) {
+    if (!is_null($userId)) {
         $fields = [
             'app_id' => env('ONESIGNAL_APP_ID'),
             'contents' => $content,
