@@ -13,7 +13,7 @@ class AllUserTransformers extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        //
+        'presence',
     ];
 
     /**
@@ -42,5 +42,10 @@ class AllUserTransformers extends TransformerAbstract
             'phone' => $user->phone ?? "",
             'email' => $user->email ?? "",
         ];
+    }
+
+    public function includePresence(User $user)
+    {
+        return $this->collection($user->presensi()->today()->get(), new AttendeTransformers);
     }
 }
