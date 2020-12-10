@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\AttendeController;
+use App\Http\Controllers\Api\OutstationController;
+use App\Http\Controllers\Api\AbsentPermissionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +18,9 @@ use App\Http\Controllers\Api\UserController;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::post('login', [UserController::class, 'login']);
 
@@ -26,9 +29,29 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('my', [UserController::class, 'show']);
     Route::post('change_password', [UserController::class, 'update_password']);
     Route::get('user', [UserController::class, 'index']);
-    Route::post('presence', [UserController::class, 'presence']);
-    Route::post('permission', [UserController::class, 'createPermission']);
-    Route::get('permission', [UserController::class, 'permission']);
-    Route::get('permission/all', [UserController::class, 'allPermissions']);
-    Route::post('permission/approve',  [UserController::class, 'approvePermission']);
+    Route::post('presence', [AttendeController::class, 'presence']);
+
+    Route::group(['prefix' => 'notifications'], function () {
+        Route::get('/', [UserController::class, 'notifications']);
+        Route::post('/', [UserController::class, 'readNotification']);
+        Route::get('/read', [UserController::class, 'readAllNotifications']);
+        Route::get('/delete', [UserController::class, 'deleteAllNotifications']);
+    });
+
+
+
+    Route::group(['prefix' => 'permission'], function () {
+        Route::post('/', [AbsentPermissionController::class, 'store']);
+        Route::get('/', [AbsentPermissionController::class, 'index']);
+        Route::get('/all', [AbsentPermissionController::class, 'all']);
+        Route::post('/approve',  [AbsentPermissionController::class, 'approve']);
+    });
+
+
+    Route::group(['prefix' => 'outstation'], function () {
+        Route::post('/', [OutstationController::class, 'store']);
+        Route::get('/', [OutstationController::class, 'index']);
+        Route::get('/all', [OutstationController::class, 'all']);
+        Route::post('/approve', [OutstationController::class, 'approve']);
+    });
 });
