@@ -50,6 +50,10 @@ class GenerateAttendeCommand extends Command
                     if (!is_null($permit) && $permit->is_approved) {
                         $status = Attende::PERMISSION;
                     }
+                    $outstation = $user->dinas_luar()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
+                    if (!is_null($outstation) && $outstation->is_approved) {
+                        $status = Attende::OUTSTATION;
+                    }
                     Attende::create([
                         'user_id' => $user->id,
                         'attende_code_id' => $code->id,

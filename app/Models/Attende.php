@@ -17,6 +17,7 @@ class Attende extends Model
     const LATE = 2;
     const ABSENT = 3;
     const PERMISSION = 4;
+    const OUTSTATION = 5;
 
     protected $guarded = [];
 
@@ -58,5 +59,19 @@ class Attende extends Model
     public function scopeIzin($query)
     {
         return $query->where('attende_status_id', self::PERMISSION);
+    }
+
+    public function format()
+    {
+        return [
+            'user' => [
+                'name' => $this->pegawai->name,
+                'position' => $this->pegawai->position,
+                'department' => $this->pegawai->departemen->name,
+                'status' => $this->pegawai->status
+            ],
+            'status_kehadiran' => $this->status_kehadiran->name,
+            'jam_absen' => $this->attend_time,
+        ];
     }
 }
