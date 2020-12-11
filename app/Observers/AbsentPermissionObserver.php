@@ -44,13 +44,17 @@ class AbsentPermissionObserver
 
     private function updateStatus($from, $to, AbsentPermission $absentPermission)
     {
-        if (Carbon::parse($absentPermission->due_date) < today()) {
+        if (Carbon::parse($absentPermission->due_date)->isAfter(today())) {
+            return;
+        }
+
+        if (Carbon::parse($absentPermission->due_date)->isBefore(today())) {
             $presences = $absentPermission->user->presensi()
                 ->whereDate('created_at', '>=', Carbon::parse($absentPermission->start_date)->toDateString())
                 ->whereDate('created_at', '<=',  Carbon::parse($absentPermission->due_date)->toDateString())
                 ->where('attende_status_id', $from)->get();
         } else {
-            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', $from)->get();
+            $presences = $absentPermission->user->presensi()->today()->where('attende_status_id', $from)->get();
         }
         foreach ($presences as $presence) {
             $presence->update([

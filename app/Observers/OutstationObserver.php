@@ -43,6 +43,11 @@ class OutstationObserver
 
     private function updateStatus($from, $to, $outstation)
     {
+
+        if (Carbon::parse($outstation->due_date)->isAfter(today())) {
+            return;
+        }
+
         if (Carbon::parse($outstation->due_date)->isBefore(today())) {
             $presences = $outstation->user->presensi()
                 ->whereDate('created_at', '>=', Carbon::parse($outstation->start_date))
