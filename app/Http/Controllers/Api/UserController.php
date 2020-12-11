@@ -182,6 +182,17 @@ class UserController extends Controller
         return setJson(true, 'Berhasil', 'Sukses menghapus semua pemberitahuan!', 200, []);
     }
 
+    public function send(Request $request)
+    {
+        if ($request->user()->position !== 'Camat') {
+            return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
+        }
+
+        sendNotification($request->content, $request->title);
+
+        return setJson(true, 'Berhasil', 'Sukses mengirimkan pengumumam!', 200, []);
+    }
+
     private function checkNextPresence($userId)
     {
         $attendeCode = AttendeCode::with(['tipe'])->whereDate('created_at', today())->get();
