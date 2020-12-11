@@ -188,6 +188,18 @@ class UserController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'content' => 'required|string'
+        ], [
+            'title.required' => 'Judul tidak boleh kosong!',
+            'content.required' => 'Isi pemberitahuan tidak boleh kosong!'
+        ]);
+
+        if ($validator->fails()) {
+            return setJson(false, 'Terjadi kesalahan!', [], 400, $validator->errors());
+        }
+
         sendNotification($request->content, $request->title);
 
         return setJson(true, 'Berhasil', 'Sukses mengirimkan pengumumam!', 200, []);
