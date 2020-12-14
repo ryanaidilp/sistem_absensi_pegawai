@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Models\Outstation;
+use Illuminate\Support\Facades\Storage;
 use League\Fractal\TransformerAbstract;
 
 class OutstationTransformer extends TransformerAbstract
@@ -38,7 +39,7 @@ class OutstationTransformer extends TransformerAbstract
             'is_approved' => $outstation->is_approved ? true : false,
             'start_date' => $outstation->start_date,
             'due_date' => $outstation->due_date,
-            'photo' => $outstation->photo
+            'photo' => env('MEDIA_URL') . Storage::url($outstation->photo),
         ];
     }
 }
