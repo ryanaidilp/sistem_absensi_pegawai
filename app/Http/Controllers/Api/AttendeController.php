@@ -31,6 +31,13 @@ class AttendeController extends Controller
             return setJson(false, 'Terjadi kesalahan!', [], 400, $validator->errors());
         }
 
+        $distance = getDistance($request->latitude, $request->longitude);
+
+        if ($distance > 1) {
+            $distance = number_format($distance, 2, ',', '.');
+            return setJson(false, "Sistem mendeteksi anda berada $distance km dari kantor!", [], 400, ['message' => "Lokasi tidak sesuai"]);
+        }
+
         $code = AttendeCode::where('code', $request->code)->first();
 
         if (!$code) {
