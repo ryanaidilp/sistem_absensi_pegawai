@@ -63,6 +63,28 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat izin tertanggal hari ini dan setelahnya.']]);
         }
 
+        $permissions = AbsentPermission::whereYear('start_date', now()->year)
+            ->where([
+                ['user_id', request()->user()->id],
+            ])->get();
+
+        $startDate = Carbon::parse($request->start_date);
+        $dueDate = Carbon::parse($request->due_date);
+        $totalDay = $startDate->diffInDays($dueDate);
+
+        if ($permissions->count() > 0) {
+            foreach ($permissions as $permission) {
+                $startDate = Carbon::parse($permission->start_date);
+                $dueDate = Carbon::parse($permission->due_date);
+                $diff = $startDate->diffInDays($dueDate) + 1;
+                $totalDay += $diff;
+            }
+        }
+
+        if ($totalDay > 12) {
+            return setJson(false, 'Pelanggaran', [], 400, ['tanggal_kadaluarsa' => ['Izin tidak boleh lebih dari 12 hari dalam satu tahun.']]);
+        }
+
         $realImage = base64_decode($request->photo);
         $imageName = $request->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
 
