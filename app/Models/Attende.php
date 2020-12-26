@@ -61,6 +61,11 @@ class Attende extends Model
         return $query->where('attende_status_id', self::PERMISSION);
     }
 
+    public function scopeDinasLuar($query)
+    {
+        return $query->where('attende_status_id', self::OUTSTATION);
+    }
+
     public function format()
     {
         return [
