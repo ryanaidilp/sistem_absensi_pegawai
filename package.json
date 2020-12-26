@@ -32,7 +32,7 @@
     "dependencies": {
         "@inertiajs/inertia": "^0.6.3",
         "@inertiajs/inertia-vue": "^0.4.3",
-        "@inertiajs/progress": "^0.2.3",
+        "@inertiajs/progress": "^0.2.4",
         "portal-vue": "^2.1.7"
     }
 }
