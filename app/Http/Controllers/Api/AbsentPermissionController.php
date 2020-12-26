@@ -51,7 +51,11 @@ class AbsentPermissionController extends Controller
                 'file_name' => 'required',
             ],
             [
-                'required' => ':attribute tidak boleh kosong!'
+                'title.required' => 'Judul tidak boleh kosong!',
+                'description.required' => 'Deskripsi tidak boleh kosong!',
+                'photo.required' => 'Foto tidak boleh kosong!',
+                'due_date.required' => 'Tanggal selesai tidak boleh kosong!',
+                'start_date.required' => 'Tanggal mulai tidak boleh kosong!',
             ]
         );
 

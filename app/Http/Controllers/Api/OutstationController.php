@@ -6,14 +6,14 @@ use Carbon\Carbon;
 use App\Models\Outstation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Notifications\OutstationApprovedNotification;
-use App\Notifications\OutstationCreatedNotification;
-use App\Notifications\OutstationRejectedNotification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\OutstationTransformer;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Transformers\EmployeeOutstationTransformer;
+use App\Notifications\OutstationCreatedNotification;
+use App\Notifications\OutstationRejectedNotification;
+use App\Notifications\OutstationApprovedNotification;
 
 class OutstationController extends Controller
 {
@@ -50,7 +50,11 @@ class OutstationController extends Controller
                 'file_name' => 'required',
             ],
             [
-                'required' => ':attribute tidak boleh kosong!'
+                'title.required' => 'Judul tidak boleh kosong!',
+                'description.required' => 'Deskripsi tidak boleh kosong!',
+                'photo.required' => 'Foto tidak boleh kosong!',
+                'due_date.required' => 'Tanggal selesai tidak boleh kosong!',
+                'start_date.required' => 'Tanggal mulai tidak boleh kosong!',
             ]
         );
 

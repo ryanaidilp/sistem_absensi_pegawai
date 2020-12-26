@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
+use Carbon\Carbon;
 use App\Models\Attende;
+use App\Models\AttendeCode;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\AttendeCode;
-use App\Notifications\AttendeStatusUpdatedNotification;
-use App\Transformers\AttendeTransformers;
-use App\Transformers\Serializers\CustomSerializer;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Transformers\AttendeTransformers;
 use Illuminate\Support\Facades\Validator;
+use App\Transformers\Serializers\CustomSerializer;
+use App\Notifications\AttendeStatusUpdatedNotification;
 
 class AttendeController extends Controller
 {
@@ -25,6 +25,12 @@ class AttendeController extends Controller
             'longitude' => 'required',
             'address' => 'required',
             'file_name' => 'required',
+        ], [
+            'code.required' => 'Kode absen tidak boleh kosong!',
+            'address.required' => 'Alamat tidak boleh kosong!',
+            'photo.required' => 'Foto tidak boleh kosong!',
+            'latitude.required' => 'Latitude tidak boleh kosong!',
+            'longitude.required' => 'Longitude tidak boleh kosong!',
         ]);
 
         if ($validator->fails()) {
@@ -62,7 +68,7 @@ class AttendeController extends Controller
         }
 
         if (!is_null($attende->attend_time)) {
-            return setJson(false, 'Anda sudah mengisi presensi!', [], 400, ['message' => 'Anda sudah mengisi presensi!']);
+            return setJson(false, 'Anda sudah melakukan presensi!', [], 400, ['message' => 'Anda sudah melakukan presensi!']);
         }
 
 

@@ -47,7 +47,8 @@ class UserController extends Controller
             'password' => 'required',
             'device_name' => 'required'
         ], [
-            'required' => ':attribute tidak boleh kosong!'
+            'phone.required' => 'No handphone tidak boleh kosong!',
+            'password.required' => 'Kata sandi/password tidak boleh kosong!'
         ]);
 
         if ($validator->fails()) {
@@ -101,7 +102,10 @@ class UserController extends Controller
             'new_pass_conf' => 'required|same:new_pass'
         ], [
             'new_pass.different' => 'Password baru tidak boleh sama dengan password lama!',
-            'new_pass_conf.same' => 'Password konfirmasi tidak cocok!'
+            'new_pass_conf.same' => 'Password konfirmasi tidak cocok!',
+            'old_pass.required' => 'Password lama harus diisi!',
+            'new_pass.required' => 'Password baru harus diisi!',
+            'new_pass_conf.required' => 'Konfirmasi password harus diisi!!'
         ]);
 
         if ($validator->fails()) {
