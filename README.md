@@ -19,9 +19,32 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 
 ## Feature
 
-* Halaman absensi yang menampilkan ***QR Code*** untuk di-*scan* oleh pegawai menggunakan aplikasi **SIAP** Android.
+* Halaman absensi yang menampilkan ***QR Code*** untuk di-*scan* oleh pegawai menggunakan aplikasi [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap) Android.
 * Halaman tabel yang menampilkan data kehadiran pegawai (PNS & Honorer).
 * Halaman administrator menggunakan [Voyager](https://voyager.devdojo.com/)
+
+## Konfigurasi
+
+* ***Environment Variable***
+
+    ```dotenv
+    CALENDARIFIC_KEY = *Your calendarific API-KEY*
+    ONESIGNAL_APP_ID='Your One Signal APP-ID'
+    ONESIGNAL_API_KEY='Your One Signal API-KEY'
+    ONESIGNAL_API_URL='https://onesignal.com/api/v1/notifications'
+    MEDIA_URL="Your media storage url" #Required if you deploy app in shared hosting
+    LATITUDE_OFFSET="latitude of your office location"
+    LONGITUDE_OFFSET="longitude of your office location"
+    ```
+
+  * ***Calendarific Key***
+    *Calendarific Key* diperlukan untuk mendapatkan data hari libur nasional dari [Calendarific API](https://calendarific.com/).
+
+  * ***One Signal APP_ID, API_KEY, & API_URL***
+    Variabel ini diperlukan untuk mengirim ***push notification*** ke aplikasi [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap). Untuk mendapatkan data ini, silahkan buat akun di [One Signal](https://app.onesignal.com) lalu ikuti petunjuk pada dokumentasi resminya.
+
+  * ***Latitude & Longirude Offset***
+    Data ini diperlukan untuk mengecek jarak user dari kantor saat melakukan presensi. Hal ini dilakukan untuk memastikan bahwa user melakukan presensi di kantor.
 
 ## To-Do List
 
