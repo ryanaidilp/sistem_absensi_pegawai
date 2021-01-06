@@ -232,7 +232,6 @@ class UserController extends Controller
             ['user_id', $request->user()->id]
         ])
             ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
             ->get();
         $total_permission_day = 0;
         foreach ($absent_permission as $permission) {
@@ -249,7 +248,6 @@ class UserController extends Controller
                 ['user_id', $request->user()->id]
             ])
             ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
             ->get();
         $total_outstation_day = 0;
         foreach ($outstations as $outstation) {
@@ -265,7 +263,6 @@ class UserController extends Controller
         ])
             ->with(['status_kehadiran', 'kode_absen.tipe'])
             ->whereYear('created_at', $year)
-            ->whereMonth('created_at', $month)
             ->orderBy('attende_code_id')
             ->get();
 
@@ -309,8 +306,8 @@ class UserController extends Controller
             }
         }
 
-        $monthly = $daily_formated->filter(function ($item) {
-            return Carbon::parse($item['date'])->format('F') === now()->format('F');
+        $monthly = $daily_formated->filter(function ($item) use ($month, $year) {
+            return Carbon::parse($item['date'])->format('F') === Carbon::create($year, $month, 1)->format('F');
         });
         $monthly_late_count = $monthly->sum(function ($item) {
             return collect($item['attendances'])->filter(function ($attende) {
