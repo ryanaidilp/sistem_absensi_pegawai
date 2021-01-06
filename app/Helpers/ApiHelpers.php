@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Attende;
 use Illuminate\Support\Facades\Http;
 
 function setJson($success, $message, $data, $statusCode, $errors = [])
@@ -54,4 +55,19 @@ function getDistance($latitude1, $longitude1, $latitude2 = -0.0497952, $longitud
     $distance = $degrees * 111.13384;
 
     return (round($distance, 2));
+}
+
+function checkAttendancePercentage($status)
+{
+    switch ($status) {
+        case Attende::ON_TIME:
+        case Attende::OUTSTATION:
+            return 100;
+        case Attende::PERMISSION:
+            return 50;
+        case Attende::LATE:
+            return 25;
+        default:
+            return 0;
+    }
 }

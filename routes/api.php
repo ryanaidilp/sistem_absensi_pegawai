@@ -39,7 +39,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/send', [UserController::class, 'send']);
     });
 
-
+    Route::get('statistics', [UserController::class, 'myStatistic']);
 
     Route::group(['prefix' => 'permission'], function () {
         Route::post('/', [AbsentPermissionController::class, 'store']);

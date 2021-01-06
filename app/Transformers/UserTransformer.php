@@ -47,7 +47,8 @@ class UserTransformer extends TransformerAbstract
         if ($holiday !== null) {
             $holiday = [
                 'name' => optional($holiday)->name,
-                'date' => optional($holiday)->date
+                'date' => optional($holiday)->date,
+                'description' => optional($holiday)->description,
             ];
         }
         return [

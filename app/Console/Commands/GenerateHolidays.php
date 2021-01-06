@@ -43,7 +43,7 @@ class GenerateHolidays extends Command
         $dates = Calendarific::make(
             env('CALENDARIFIC_KEY'),
             'ID',
-            now()->year,
+            now()->addYear()->year,
             null,
             null,
             null,
