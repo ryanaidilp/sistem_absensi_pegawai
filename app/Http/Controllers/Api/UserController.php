@@ -6,10 +6,12 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Attende;
 use App\Models\Holiday;
+use App\Models\Outstation;
 use App\Models\AttendeCode;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\Controller;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\AllUserTransformers;
@@ -207,6 +209,142 @@ class UserController extends Controller
         sendNotification($request->content, $request->title);
 
         return setJson(true, 'Berhasil', 'Sukses mengirimkan pengumumam!', 200, []);
+    }
+
+    public function myStatistic(Request $request)
+    {
+        $year = $request->has('year') ? $request->year : now()->year;
+        $month = $request->has('month') ? $request->month : now()->month;
+
+        // Get holiday data
+        $holidays = Holiday::whereYear('date', now()->year)->get();
+        $holidays = $holidays->map(function ($holiday) {
+            return [
+                'date' => $holiday->date,
+                'name' => $holiday->name,
+                'description' => $holiday->description
+            ];
+        })->toArray();
+
+        // Get User's Absent Permission
+        $absent_permission = AbsentPermission::select(['id', 'user_id', 'start_date', 'due_date'])->where([
+            ['is_approved', 1],
+            ['user_id', $request->user()->id]
+        ])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->get();
+        $total_permission_day = 0;
+        foreach ($absent_permission as $permission) {
+            $startDate = Carbon::parse($permission->start_date);
+            $dueDate = Carbon::parse($permission->due_date);
+            $diff = $startDate->diffInDays($dueDate) + 1;
+            $total_permission_day += $diff;
+        }
+
+        // Get User's Outstation
+        $outstations = Outstation::select(['id', 'user_id', 'start_date', 'due_date'])
+            ->where([
+                ['is_approved', true],
+                ['user_id', $request->user()->id]
+            ])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->get();
+        $total_outstation_day = 0;
+        foreach ($outstations as $outstation) {
+            $startDate = Carbon::parse($outstation->start_date);
+            $dueDate = Carbon::parse($outstation->due_date);
+            $diff = $startDate->diffInDays($dueDate) + 1;
+            $total_outstation_day += $diff;
+        }
+
+        // Get User's Attendance Data
+        $dates = Attende::where([
+            ['user_id', $request->user()->id]
+        ])
+            ->with(['status_kehadiran', 'kode_absen.tipe'])
+            ->whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('attende_code_id')
+            ->get();
+
+        // Map user attendance data to daily attendance
+        $daily = $dates->groupBy(function ($item) {
+            return $item->created_at->format('d-m-Y');
+        })->map(function ($attendes) {
+            $percentage = 0;
+            foreach ($attendes as $attende) {
+                $percentage += checkAttendancePercentage($attende->attende_status_id);
+            }
+            return [
+                'date' => $attende->created_at->format('Y-m-d'),
+                'attendance_percentage' => round($percentage / 4, 2),
+                'attendances' => $attendes->map(function ($attende) {
+                    return [
+                        'absent_type' => $attende->kode_absen->tipe->name,
+                        'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "-",
+                        'attend_status' => $attende->status_kehadiran->name
+                    ];
+                })
+            ];
+        })->toArray();
+
+        $daily_formated = [];
+        foreach ($daily as $value) {
+            array_push($daily_formated, $value);
+        }
+        $daily_formated = collect($daily_formated);
+
+        $yearly_absent_count = $daily_formated->filter(function ($item) {
+            return $item['attendance_percentage'] === 0;
+        })->count();
+
+        $yearly_late_count = 0;
+        foreach ($daily_formated as $daily) {
+            foreach ($daily['attendances'] as $attende) {
+                if ($attende['attend_status'] === 'Terlambat') {
+                    $yearly_late_count++;
+                }
+            }
+        }
+
+        $monthly = $daily_formated->filter(function ($item) {
+            return Carbon::parse($item['date'])->format('F') === now()->format('F');
+        });
+        $monthly_late_count = $monthly->sum(function ($item) {
+            return collect($item['attendances'])->filter(function ($attende) {
+                return $attende['attend_status'] === 'Terlambat';
+            })->count();
+        });
+
+
+        $data = [
+            'yearly' => [
+                'attendance_percentage' => round($daily_formated->average('attendance_percentage'), 2),
+                'absent_permission' => [
+                    'day' => $total_permission_day,
+                    'percentage' => round($total_permission_day / 12 * 100, 2)
+                ],
+                'outstation' => [
+                    'day' => $total_outstation_day,
+                    'percentage' => $daily_formated->count() > 0 ?  round($total_outstation_day / $daily_formated->count() * 100, 2) : 0
+                ],
+                'absent' => [
+                    'day' => $yearly_absent_count,
+                    'percentage' => $daily_formated->count() > 0 ?  round($yearly_absent_count / $daily_formated->count() * 100, 2) : 0
+                ],
+                'late_count' => $yearly_late_count
+            ],
+            'monthly' => [
+                'attendance_percentage' => round($monthly->average('attendance_percentage'), 2),
+                'late_count' => $monthly_late_count,
+            ],
+            'daily' => $daily_formated,
+            'holidays' => $holidays
+        ];
+
+        return setJson(true, 'Sukses', $data, 200, []);
     }
 
     private function checkNextPresence($userId)
