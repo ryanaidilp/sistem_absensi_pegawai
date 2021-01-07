@@ -294,7 +294,7 @@ class UserController extends Controller
         $daily_formated = collect($daily_formated);
 
         $yearly_absent_count = $daily_formated->filter(function ($item) {
-            return $item['attendance_percentage'] === 0;
+            return $item['attendance_percentage'] == 0;
         })->count();
 
         $yearly_late_count = 0;
