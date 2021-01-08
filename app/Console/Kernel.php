@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use App\Console\Commands\GenerateAttendeCommand;
 use App\Console\Commands\CreateAbsentCodeCommand;
 use App\Console\Commands\NotifyExpiredOutstation;
+use App\Console\Commands\NotifyExpiredPaidLeave;
 use App\Console\Commands\NotifyExpiredPermission;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -23,7 +24,8 @@ class Kernel extends ConsoleKernel
         GenerateAttendeCommand::class,
         CreateAbsentCodeCommand::class,
         NotifyExpiredPermission::class,
-        NotifyExpiredOutstation::class
+        NotifyExpiredOutstation::class,
+        NotifyExpiredPaidLeave::class
     ];
 
     /**
@@ -40,6 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('debugbar:clear')->dailyAt('00:50');
         $schedule->command('permission:check')->dailyAt("01:10");
         $schedule->command('outstation:check')->dailyAt("01:15");
+        $schedule->command('paidleave:check')->dailyAt("00:00");
         $schedule->command('absent:code')->weekdays()->at('01:00')
             ->onSuccess(function () {
                 Log::info('code_generated_successfully');
