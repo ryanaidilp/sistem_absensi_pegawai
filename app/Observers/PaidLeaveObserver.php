@@ -24,7 +24,7 @@ class PaidLeaveObserver
             $presences = $paidLeave->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
             foreach ($presences as $presence) {
                 $presence->update([
-                    'attende_status_id' => $status
+                    'attende_status_id' => $status->id
                 ]);
             }
         }
