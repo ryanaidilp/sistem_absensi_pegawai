@@ -19,7 +19,12 @@ class AttendeStatusSeeder extends Seeder
             'Tepat Waktu',
             'Terlambat',
             'Tidak Hadir',
-            'Izin'
+            'Izin',
+            'Cuti Tahunan',
+            'Cuti Alasan Penting',
+            'Cuti Bersalin',
+            'Cuti Sakit',
+            'Cuti Diluar Tanggungan'
         ];
 
         foreach ($data as $status) {
