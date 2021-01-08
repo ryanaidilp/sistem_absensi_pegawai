@@ -54,6 +54,8 @@ class UserTransformer extends TransformerAbstract
         return [
             'id' => $user->id,
             'nip' => $user->nip,
+            'rank' => optional($user->golongan)->rank,
+            'group' => optional($user->golongan)->group,
             'name' => $user->name,
             'phone' => $user->phone,
             'gender' => $user->gender->name,
