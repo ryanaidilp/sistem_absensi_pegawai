@@ -29,7 +29,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::with(['gender', 'departemen'])
+        $users = User::with(['gender', 'departemen', 'golongan'])
             ->where('id', '!=', $request->user()->id)->where(function ($query) {
                 return $query->pns()
                     ->orWhere
