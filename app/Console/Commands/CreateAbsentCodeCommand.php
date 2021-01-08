@@ -58,7 +58,7 @@ class CreateAbsentCodeCommand extends Command
                     'Absen Pagi' => '07:00',
                     'Absen Istrahat' => now()->isFriday() ? '11:30' : '12:00',
                     'Absen Siang' => '13:00',
-                    'Absen Pulang' => '16:00'
+                    'Absen Pulang' => now()->isFriday() ? '16:30' : '16:00'
                 ][$type->name];
                 $end_time = [
                     'Absen Pagi' => '08:00',
