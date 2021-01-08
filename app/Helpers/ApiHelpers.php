@@ -62,7 +62,12 @@ function checkAttendancePercentage($status)
     switch ($status) {
         case Attende::ON_TIME:
         case Attende::OUTSTATION:
+        case Attende::ANNUAL_LEAVE:
             return 100;
+        case Attende::MATERNITY_LEAVE:
+        case Attende::SICK_LEAVE:
+        case Attende::IMPORTANT_REASON_LEAVE:
+            return 97.5;
         case Attende::PERMISSION:
             return 50;
         case Attende::LATE:
