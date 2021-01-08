@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AttendeController;
 use App\Http\Controllers\Api\OutstationController;
 use App\Http\Controllers\Api\AbsentPermissionController;
+use App\Http\Controllers\Api\PaidLeaveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,5 +55,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [OutstationController::class, 'index']);
         Route::get('/all', [OutstationController::class, 'all']);
         Route::post('/approve', [OutstationController::class, 'approve']);
+    });
+
+    Route::group(['prefix' => 'paid-leave'], function () {
+        Route::post('/', [PaidLeaveController::class, 'store']);
+        Route::get('/', [PaidLeaveController::class, 'index']);
+        Route::get('/all', [PaidLeaveController::class, 'all']);
+        Route::post('/approve', [PaidLeaveController::class, 'approve']);
     });
 });

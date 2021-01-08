@@ -62,8 +62,10 @@ class OutstationController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        if (Carbon::parse($request->due_date) < today()) {
-            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat dinas luar tertanggal hari ini atau setelahnya.']]);
+        $outstation = Outstation::whereDate('start_date', now())->first();
+
+        if ($outstation) {
+            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan dinas luar tertanggal ' . now()->translatedFormat('l, d F Y')]]);
         }
 
         $realImage = base64_decode($request->photo);
@@ -135,7 +137,9 @@ class OutstationController extends Controller
         $outstation = Outstation::where([
             ['id', $request->outstation_id],
             ['user_id', $request->user_id]
-        ])->first();
+        ])
+            ->with(['user'])
+            ->first();
         $update = $outstation->update([
             'is_approved' => $request->is_approved
         ]);
@@ -145,7 +149,7 @@ class OutstationController extends Controller
             new OutstationRejectedNotification($outstation);
 
         if ($update) {
-            $request->user()->notify($notification);
+            $outstation->user->notify($notification);
             return setJson(
                 true,
                 'Sukses mengubah status dinas luar!',

@@ -18,7 +18,9 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             UserSeeder::class,
             AttendeTypeSeeder::class,
-            AttendeStatusSeeder::class
+            AttendeStatusSeeder::class,
+            LeaveCategorySeeder::class,
+            GovernmentEmployeeGroupSeeder::class
         ]);
     }
 }

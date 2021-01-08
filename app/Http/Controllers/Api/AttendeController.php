@@ -38,8 +38,7 @@ class AttendeController extends Controller
         }
 
         $distance = getDistance($request->latitude, $request->longitude);
-
-        if ($distance > 1) {
+        if ($distance > 0.5) {
             $distance = number_format($distance, 2, ',', '.');
             return setJson(false, "Sistem mendeteksi anda berada $distance km dari kantor!", [], 400, ['message' => "Lokasi tidak sesuai"]);
         }
@@ -83,7 +82,7 @@ class AttendeController extends Controller
 
         if ($checkForLate) {
             $timeTolerance = [
-                AttendeCode::MORNING => 15,
+                AttendeCode::MORNING => 30,
                 AttendeCode::AFTERNOON => 30,
             ][$code->code_type_id];
             if (now() <= Carbon::parse($code->end_time)->subMinutes($timeTolerance)) {

@@ -18,6 +18,11 @@ class Attende extends Model
     const ABSENT = 3;
     const PERMISSION = 4;
     const OUTSTATION = 5;
+    const ANNUAL_LEAVE = 6;
+    const IMPORTANT_REASON_LEAVE = 7;
+    const SICK_LEAVE = 8;
+    const MATERNITY_LEAVE = 9;
+    const OUT_OF_LIABILITY_LEAVE = 10;
 
     protected $guarded = [];
 
@@ -64,6 +69,31 @@ class Attende extends Model
     public function scopeDinasLuar($query)
     {
         return $query->where('attende_status_id', self::OUTSTATION);
+    }
+
+    public function scopeCutiTahunan($query)
+    {
+        return $query->where('attende_status_id', self::ANNUAL_LEAVE);
+    }
+
+    public function scopeCutiAlasanPenting($query)
+    {
+        return $query->where('attende_status_id', self::IMPORTANT_REASON_LEAVE);
+    }
+
+    public function scopeCutiSakit($query)
+    {
+        return $query->where('attende_status_id', self::SICK_LEAVE);
+    }
+
+    public function scopeCutiBersalin($query)
+    {
+        return $query->where('attende_status_id', self::MATERNITY_LEAVE);
+    }
+
+    public function scopeCutiDiluarTanggungan($query)
+    {
+        return $query->where('attende_status_id', self::OUT_OF_LIABILITY_LEAVE);
     }
 
     public function format()

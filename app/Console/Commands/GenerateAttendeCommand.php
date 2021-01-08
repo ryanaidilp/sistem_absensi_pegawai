@@ -4,6 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Attende;
 use App\Models\AttendeCode;
+use App\Models\AttendeStatus;
+use App\Models\LeaveCategory;
 use App\Models\User;
 use Illuminate\Console\Command;
 
@@ -53,6 +55,11 @@ class GenerateAttendeCommand extends Command
                     $outstation = $user->dinas_luar()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
                     if (!is_null($outstation) && $outstation->is_approved) {
                         $status = Attende::OUTSTATION;
+                    }
+                    $paid_leave = $user->cuti()->whereDate('start_date', '<=', today())->whereDate('due_date', '>=', today())->first();
+                    if (!is_null($paid_leave) && $paid_leave->is_approved) {
+                        $status = AttendeStatus::where('name', $paid_leave->kategori->name)->first();
+                        $status = $status->id;
                     }
                     Attende::create([
                         'user_id' => $user->id,

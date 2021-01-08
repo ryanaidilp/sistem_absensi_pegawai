@@ -35,7 +35,8 @@ class AllUserTransformers extends TransformerAbstract
         return [
             'nip' => $user->nip ?? "",
             'name' => $user->name,
-            'gender' => $user->gender->name,
+            'rank' => optional($user->golongan)->rank,
+            'group' => optional($user->golongan)->group,
             'status' => $user->status,
             'department' => $user->departemen->name,
             'position' => $user->position,
