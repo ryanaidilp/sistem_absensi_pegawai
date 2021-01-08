@@ -5,10 +5,12 @@ namespace App\Models;
 use Carbon\Carbon;
 use App\Models\Gender;
 use App\Models\Attende;
+use App\Models\PaidLeave;
 use App\Models\Outstation;
 use App\Models\Department;
 use App\Models\AbsentPermission;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\GovernmentEmployeeGroup;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -50,6 +52,11 @@ class User extends \TCG\Voyager\Models\User
         return $this->belongsTo(Department::class, 'department_id', 'id');
     }
 
+    public function golongan()
+    {
+        return $this->belongsTo(GovernmentEmployeeGroup::class, 'government_employee_group_id', 'id');
+    }
+
     public function izin()
     {
         return $this->hasMany(AbsentPermission::class, 'user_id', 'id');
@@ -58,6 +65,11 @@ class User extends \TCG\Voyager\Models\User
     public function dinas_luar()
     {
         return $this->hasMany(Outstation::class, 'user_id', 'id');
+    }
+
+    public function cuti()
+    {
+        return $this->hasMany(PaidLeave::class, 'user_id', 'id');
     }
 
     public function presensi()
