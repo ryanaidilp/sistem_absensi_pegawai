@@ -63,13 +63,16 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        if (Carbon::parse($request->due_date) < today()) {
-            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Hanya boleh menambahkan surat izin tertanggal hari ini dan setelahnya.']]);
+        $permission = AbsentPermission::whereDate('start_date', now())->first();
+
+        if ($permission) {
+            return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan izin tertanggal ' . now()->translatedFormat('l, d F Y')]]);
         }
 
         $permissions = AbsentPermission::whereYear('start_date', now()->year)
             ->where([
                 ['user_id', request()->user()->id],
+                ['is_approved', true]
             ])->get();
 
         $startDate = Carbon::parse($request->start_date);
@@ -157,7 +160,9 @@ class AbsentPermissionController extends Controller
         $permission = AbsentPermission::where([
             ['id', $request->permission_id],
             ['user_id', $request->user_id]
-        ])->first();
+        ])
+            ->with(['user'])
+            ->first();
         $update = $permission->update([
             'is_approved' => $request->is_approved
         ]);
@@ -167,7 +172,7 @@ class AbsentPermissionController extends Controller
             new AbsentPermissionRejectedNotification($permission);
 
         if ($update) {
-            $request->user()->notify($notification);
+            $permission->user->notify($notification);
             return setJson(
                 true,
                 'Sukses mengubah status izin!',
