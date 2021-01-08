@@ -37,7 +37,7 @@ class PaidLeaveTransformer extends TransformerAbstract
             'category' => $paidLeave->kategori->name,
             'title' => $paidLeave->title,
             'description' => $paidLeave->description,
-            'is_approved' => $paidLeave->is_approved,
+            'is_approved' => $paidLeave->is_approved ? true : false,
             'start_date' => $paidLeave->start_date,
             'due_date' => $paidLeave->due_date,
             'photo' => env('MEDIA_URL') . Storage::url($paidLeave->photo),
