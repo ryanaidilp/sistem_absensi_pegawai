@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use App\Models\LeaveCategory;
 use App\Models\PaidLeave;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Validator;
@@ -247,10 +248,11 @@ class UserController extends Controller
         $total_outstation_day = $this->checkDifference($outstations);
 
         // Get User's Paid Leave data
-        $paid_leave = PaidLeave::select(['id', 'user_id', 'start_date', 'due_date'])->where([
+        $paid_leave = PaidLeave::select(['id', 'leave_category_id', 'user_id', 'start_date', 'due_date'])->where([
             ['is_approved', 1],
             ['user_id', $request->user()->id]
         ])
+            ->with(['kategori'])
             ->whereYear('created_at', $year)
             ->get();
 
@@ -259,6 +261,12 @@ class UserController extends Controller
         $sick_leave = $this->filterPaidLeave($paid_leave, PaidLeave::SICK);
         $maternity_leave = $this->filterPaidLeave($paid_leave, PaidLeave::MATERNITY);
         $out_of_liability_leave = $this->filterPaidLeave($paid_leave, PaidLeave::OUT_OF_LIABILITY);
+        $leave_categories = LeaveCategory::select('id', 'limit')->get();
+        $annual_limit = $leave_categories->where('id', PaidLeave::ANNUAL)->first()->limit;
+        $important_reason_limit = $leave_categories->where('id', PaidLeave::IMPORTANT_REASON)->first()->limit;
+        $sick_limit = $leave_categories->where('id', PaidLeave::SICK)->first()->limit;
+        $maternity_limit = $leave_categories->where('id', PaidLeave::MATERNITY)->first()->limit;
+        $out_of_liability_limit = $leave_categories->where('id', PaidLeave::OUT_OF_LIABILITY)->first()->limit;
 
 
         $total_annual_leave = $this->checkDifference($annual_leave);
@@ -381,27 +389,33 @@ class UserController extends Controller
                 ],
                 'absent' => [
                     'day' => $yearly_absent_count,
-                    'percentage' => $total_work_day > 0 ?  round($yearly_absent_count / 43 * 100, 2) : 0
+                    'percentage' => $total_work_day > 0 ?  round($yearly_absent_count / 43 * 100, 2) : 0,
+                    'limit' => 43
                 ],
                 'annual_leave' => [
                     'day' => $total_annual_leave,
-                    'percentage' => round($total_annual_leave / 12 * 100, 2)
+                    'percentage' => round($total_annual_leave / $annual_limit * 100, 2),
+                    'limit' => $annual_limit
                 ],
                 'important_reason_leave' => [
                     'day' => $total_important_reason_leave,
-                    'percentage' => round($total_important_reason_leave / 60 * 100, 2)
+                    'percentage' => round($total_important_reason_leave / $important_reason_limit * 100, 2),
+                    'limit' => $important_reason_limit
                 ],
                 'maternity_leave' => [
                     'day' => $total_maternity_leave,
-                    'percentage' => round($total_maternity_leave / 90 * 100, 2)
+                    'percentage' => round($total_maternity_leave / $maternity_limit * 100, 2),
+                    'limit' => $maternity_limit
                 ],
                 'sick_leave' => [
                     'day' => $total_sick_leave,
-                    'percentage' => round($total_sick_leave / 180 * 100, 2)
+                    'percentage' => round($total_sick_leave / $sick_limit * 100, 2),
+                    'limit' => $sick_limit
                 ],
                 'out_of_liability_leave' => [
                     'day' => $total_out_of_liability_leave,
-                    'percentage' => round($total_out_of_liability_leave / 60 * 100, 2)
+                    'percentage' => round($total_out_of_liability_leave / $out_of_liability_limit * 100, 2),
+                    'limit' => $out_of_liability_limit
                 ],
                 'late_count' => $yearly_late_count,
                 'leave_early_count' => $yearly_leave_early,
@@ -479,7 +493,7 @@ class UserController extends Controller
 
     private function filterPaidLeave($paidLeave, $category)
     {
-        return $paidLeave->filter(function ($leave) {
+        return $paidLeave->filter(function ($leave) use ($category) {
             return $leave->leave_category_id == $category;
         });
     }
