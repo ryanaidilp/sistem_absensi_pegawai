@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
+use App\Models\PaidLeave;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\AllUserTransformers;
@@ -233,13 +234,7 @@ class UserController extends Controller
         ])
             ->whereYear('created_at', $year)
             ->get();
-        $total_permission_day = 0;
-        foreach ($absent_permission as $permission) {
-            $startDate = Carbon::parse($permission->start_date);
-            $dueDate = Carbon::parse($permission->due_date);
-            $diff = $startDate->diffInDays($dueDate) + 1;
-            $total_permission_day += $diff;
-        }
+        $total_permission_day = $this->checkDifference($absent_permission);
 
         // Get User's Outstation
         $outstations = Outstation::select(['id', 'user_id', 'start_date', 'due_date'])
@@ -249,13 +244,28 @@ class UserController extends Controller
             ])
             ->whereYear('created_at', $year)
             ->get();
-        $total_outstation_day = 0;
-        foreach ($outstations as $outstation) {
-            $startDate = Carbon::parse($outstation->start_date);
-            $dueDate = Carbon::parse($outstation->due_date);
-            $diff = $startDate->diffInDays($dueDate) + 1;
-            $total_outstation_day += $diff;
-        }
+        $total_outstation_day = $this->checkDifference($outstations);
+
+        // Get User's Paid Leave data
+        $paid_leave = PaidLeave::select(['id', 'user_id', 'start_date', 'due_date'])->where([
+            ['is_approved', 1],
+            ['user_id', $request->user()->id]
+        ])
+            ->whereYear('created_at', $year)
+            ->get();
+
+        $annual_leave = $this->filterPaidLeave($paid_leave, PaidLeave::ANNUAL);
+        $important_reason_leave = $this->filterPaidLeave($paid_leave, PaidLeave::IMPORTANT_REASON);
+        $sick_leave = $this->filterPaidLeave($paid_leave, PaidLeave::SICK);
+        $maternity_leave = $this->filterPaidLeave($paid_leave, PaidLeave::MATERNITY);
+        $out_of_liability_leave = $this->filterPaidLeave($paid_leave, PaidLeave::OUT_OF_LIABILITY);
+
+
+        $total_annual_leave = $this->checkDifference($annual_leave);
+        $total_important_reason_leave = $this->checkDifference($important_reason_leave);
+        $total_sick_leave = $this->checkDifference($sick_leave);
+        $total_maternity_leave = $this->checkDifference($maternity_leave);
+        $total_out_of_liability_leave = $this->checkDifference($out_of_liability_leave);
 
         // Get User's Attendance Data
         $dates = Attende::where([
@@ -306,6 +316,27 @@ class UserController extends Controller
             }
         }
 
+        $yearly_not_absent = $daily_formated->filter(function ($item) {
+            return $item['attendance_percentage'] > 0;
+        });
+
+        $yearly_not_morning_parade = 0;
+        $yearly_leave_early = 0;
+        foreach ($yearly_not_absent as $daily) {
+            foreach ($daily['attendances'] as $attende) {
+                if ($attende['absent_type'] === 'Absen Pagi') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $yearly_not_morning_parade++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Pulang') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $yearly_leave_early++;
+                    }
+                }
+            }
+        }
+
         $monthly = $daily_formated->filter(function ($item) use ($month, $year) {
             return Carbon::parse($item['date'])->format('F') === Carbon::create($year, $month, 1)->format('F');
         });
@@ -314,28 +345,73 @@ class UserController extends Controller
                 return $attende['attend_status'] === 'Terlambat';
             })->count();
         });
+        $monthly_not_absent = $monthly->filter(function ($item) {
+            return $item['attendance_percentage'] > 0;
+        });
+        $monthly_not_morning_parade = 0;
+        $monthly_leave_early = 0;
+        foreach ($monthly_not_absent as $daily) {
+            foreach ($daily['attendances'] as $attende) {
+                if ($attende['absent_type'] === 'Absen Pagi') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $monthly_not_morning_parade++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Pulang') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $monthly_leave_early++;
+                    }
+                }
+            }
+        }
 
+        $total_work_day = $daily_formated->count() > 0 ? $daily_formated->count() : 0;
 
         $data = [
+            'total_work_day' => $total_work_day,
             'yearly' => [
                 'attendance_percentage' => round($daily_formated->average('attendance_percentage'), 2),
                 'absent_permission' => [
                     'day' => $total_permission_day,
-                    'percentage' => round($total_permission_day / 12 * 100, 2)
+                    'percentage' => $total_work_day > 0 ? round($total_permission_day / $total_work_day * 100, 2) : 0
                 ],
                 'outstation' => [
                     'day' => $total_outstation_day,
-                    'percentage' => $daily_formated->count() > 0 ?  round($total_outstation_day / $daily_formated->count() * 100, 2) : 0
+                    'percentage' => $total_work_day > 0 ?  round($total_outstation_day / $total_work_day * 100, 2) : 0
                 ],
                 'absent' => [
                     'day' => $yearly_absent_count,
-                    'percentage' => $daily_formated->count() > 0 ?  round($yearly_absent_count / $daily_formated->count() * 100, 2) : 0
+                    'percentage' => $total_work_day > 0 ?  round($yearly_absent_count / 43 * 100, 2) : 0
                 ],
-                'late_count' => $yearly_late_count
+                'annual_leave' => [
+                    'day' => $total_annual_leave,
+                    'percentage' => round($total_annual_leave / 12 * 100, 2)
+                ],
+                'important_reason_leave' => [
+                    'day' => $total_important_reason_leave,
+                    'percentage' => round($total_important_reason_leave / 60 * 100, 2)
+                ],
+                'maternity_leave' => [
+                    'day' => $total_maternity_leave,
+                    'percentage' => round($total_maternity_leave / 90 * 100, 2)
+                ],
+                'sick_leave' => [
+                    'day' => $total_sick_leave,
+                    'percentage' => round($total_sick_leave / 180 * 100, 2)
+                ],
+                'out_of_liability_leave' => [
+                    'day' => $total_out_of_liability_leave,
+                    'percentage' => round($total_out_of_liability_leave / 60 * 100, 2)
+                ],
+                'late_count' => $yearly_late_count,
+                'leave_early_count' => $yearly_leave_early,
+                'not_morning_parade_count' => $yearly_not_morning_parade
             ],
             'monthly' => [
                 'attendance_percentage' => round($monthly->average('attendance_percentage'), 2),
                 'late_count' => $monthly_late_count,
+                'leave_early_count' => $monthly_leave_early,
+                'not_morning_parade_count' => $monthly_not_morning_parade
             ],
             'daily' => $daily_formated,
             'holidays' => $holidays
@@ -387,5 +463,24 @@ class UserController extends Controller
 
 
         return $nextPresence;
+    }
+
+    private function checkDifference($data)
+    {
+        $sum = 0;
+        foreach ($data as $item) {
+            $startDate = Carbon::parse($item->start_date);
+            $dueDate = Carbon::parse($item->due_date);
+
+            $sum += $startDate->diffInDays($dueDate) + 1;
+        }
+        return $sum;
+    }
+
+    private function filterPaidLeave($paidLeave, $category)
+    {
+        return $paidLeave->filter(function ($leave) {
+            return $leave->leave_category_id == $category;
+        });
     }
 }
