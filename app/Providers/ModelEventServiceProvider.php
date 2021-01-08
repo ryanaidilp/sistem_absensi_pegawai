@@ -4,9 +4,11 @@ namespace App\Providers;
 
 use App\Models\Outstation;
 use App\Models\AbsentPermission;
+use App\Models\PaidLeave;
 use App\Observers\OutstationObserver;
 use Illuminate\Support\ServiceProvider;
 use App\Observers\AbsentPermissionObserver;
+use App\Observers\PaidLeaveObserver;
 
 class ModelEventServiceProvider extends ServiceProvider
 {
@@ -29,5 +31,6 @@ class ModelEventServiceProvider extends ServiceProvider
     {
         AbsentPermission::observe(new AbsentPermissionObserver);
         Outstation::observe(new OutstationObserver);
+        PaidLeave::observe(new PaidLeaveObserver);
     }
 }
