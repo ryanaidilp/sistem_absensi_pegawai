@@ -296,10 +296,20 @@ class UserController extends Controller
                 'date' => $attende->created_at->format('Y-m-d'),
                 'attendance_percentage' => round($percentage / 4, 2),
                 'attendances' => $attendes->map(function ($attende) {
+                    $attend_date = Carbon::parse($attende->created_at);
+                    $start_time = explode(':', "{$attende->kode_absen->start_time}");
+                    $start_time = Carbon::create(
+                        $attend_date->year,
+                        $attend_date->month,
+                        $attend_date->day,
+                        $start_time[0],
+                        $start_time[1]
+                    );
                     return [
                         'absent_type' => $attende->kode_absen->tipe->name,
                         'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "-",
-                        'attend_status' => $attende->status_kehadiran->name
+                        'attend_status' => $attende->status_kehadiran->name,
+                        'start_time' => Carbon::parse($start_time)->addMinutes(30)->translatedFormat('Y-m-d H:i:s'),
                     ];
                 })
             ];
