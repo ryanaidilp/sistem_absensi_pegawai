@@ -41,7 +41,7 @@ class OutstationApprovedNotification extends Notification
         $outstation = $this->outstation;
         return [
             'heading' => 'Dinas Luar disetujui!',
-            'body' => "Dinas Luar $outstation->title anda telah disetujui pada : " . now()->translatedFormat('l, d F Y H:i:s')
+            'body' => "$outstation->title anda telah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s')
         ];
     }
 
@@ -50,7 +50,7 @@ class OutstationApprovedNotification extends Notification
         $outstation = $this->outstation;
         return [
             'heading' => 'Dinas Luar disetujui!',
-            'body' => "Dinas Luar $outstation->title anda telah disetujui pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => "$outstation->title anda telah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s'),
             'user_id' => $notifiable->id
         ];
     }

@@ -42,7 +42,7 @@ class AbsentPermissionApprovedNotification extends Notification
         $izin = $this->permission;
         return [
             'heading' => "Izin disetujui!",
-            'body' => "Izin $izin->title anda telah disetujui pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => "$izin->title anda telah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s'),
         ];
     }
 
@@ -51,7 +51,7 @@ class AbsentPermissionApprovedNotification extends Notification
         $izin = $this->permission;
         return [
             'heading' => "Izin disetujui!",
-            'body' => "Izin $izin->title anda telah disetujui pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => "$izin->title anda telah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s'),
             'user_id' => $notifiable->id
         ];
     }

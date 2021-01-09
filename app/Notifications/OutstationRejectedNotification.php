@@ -14,15 +14,17 @@ class OutstationRejectedNotification extends Notification
     use Queueable;
 
     private $outstation;
+    private $reason;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Outstation $outstation)
+    public function __construct(Outstation $outstation, $reason)
     {
         $this->outstation = $outstation;
+        $this->reason = $reason;
     }
 
     /**
@@ -39,18 +41,22 @@ class OutstationRejectedNotification extends Notification
     public function toDatabase($notifiable)
     {
         $outstation = $this->outstation;
+        $reason = $this->reason;
+        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : $reason";
         return [
             'heading' => "Dinas Luar ditolak!",
-            'body' => "Dinas Luar $outstation->title anda telah ditolak pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => $body
         ];
     }
 
     public function toOneSignal($notifiable)
     {
         $outstation = $this->outstation;
+        $reason = $this->reason;
+        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : $reason";
         return [
             'heading' => "Dinas Luar ditolak!",
-            'body' => "Dinas Luar $outstation->title anda telah ditolak pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => $body,
             'user_id' => $notifiable->id
         ];
     }

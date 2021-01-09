@@ -53,6 +53,7 @@ class PaidLeaveCreatedNotification extends Notification
         $cuti = $this->paidLeave->load('kategori');
         $start_date = Carbon::parse($cuti->start_date)->translatedFormat('l, d F Y');
         $due_date = Carbon::parse($cuti->due_date)->translatedFormat('l, d F Y');
+        sendNotification($cuti->kategori->name . "diajukan oleh {$notifiable->name} :\n\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date", "Pengajuan {$cuti->kategori->name}!", 2);
         return [
             'user_id' => $notifiable->id,
             'heading' => $cuti->kategori->name . ' diajukan!',
