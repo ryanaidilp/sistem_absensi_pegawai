@@ -7,6 +7,12 @@ use League\Fractal\TransformerAbstract;
 
 class AllUserTransformers extends TransformerAbstract
 {
+    private $date;
+
+    public function __construct($date)
+    {
+        $this->date = $date;
+    }
     /**
      * List of resources to automatically include
      *
@@ -47,6 +53,7 @@ class AllUserTransformers extends TransformerAbstract
 
     public function includePresence(User $user)
     {
-        return $this->collection($user->presensi()->today()->get(), new AttendeTransformers);
+        $date = $this->date;
+        return $this->collection($user->presensi()->whereDate('created_at', $date)->get(), new AttendeTransformers);
     }
 }
