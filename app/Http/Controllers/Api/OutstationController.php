@@ -85,7 +85,6 @@ class OutstationController extends Controller
 
         if ($outstation) {
             $request->user()->notify(new OutstationCreatedNotification($outstation));
-            sendNotification("Dinas Luar baru diajukan oleh  {$request->user()->name} : \n$request->title", 'Pengajuan Dinas Luar!', 2);
             return setJson(
                 true,
                 'Berhasil',
@@ -134,6 +133,23 @@ class OutstationController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'reason' => 'required_if:is_approved,0',
+                'id' => '',
+                'user_id' => '',
+                'is_approved' => 'required'
+            ],
+            [
+                'reason.required_if' => 'Alasan penolakan harus diisi!'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return setJson(false, 'Gagal', [], 400, $validator->errors());
+        }
+
         $outstation = Outstation::where([
             ['id', $request->outstation_id],
             ['user_id', $request->user_id]
@@ -146,7 +162,7 @@ class OutstationController extends Controller
 
         $notification = $outstation->is_approved ?
             new OutstationApprovedNotification($outstation) :
-            new OutstationRejectedNotification($outstation);
+            new OutstationRejectedNotification($outstation, $request->reason);
 
         if ($update) {
             $outstation->user->notify($notification);
