@@ -37,7 +37,7 @@ class UserController extends Controller
             })
             ->get();
         $users = fractal()->collection($users)
-            ->transformWith(new AllUserTransformers)
+            ->transformWith(new AllUserTransformers(today()))
             ->serializeWith(new CustomSerializer)
             ->toArray();
         return setJson(true, 'Berhasil mengambil seluruh data pegawai!', $users, 200, []);
