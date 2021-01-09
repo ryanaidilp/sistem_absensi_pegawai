@@ -2,8 +2,9 @@
 
 namespace App\Transformers;
 
-use App\Models\Attende;
 use Carbon\Carbon;
+use App\Models\Attende;
+use Illuminate\Support\Facades\Storage;
 use League\Fractal\TransformerAbstract;
 
 class AttendeTransformers extends TransformerAbstract
@@ -48,7 +49,7 @@ class AttendeTransformers extends TransformerAbstract
                 'longitude' => (float) $attende->longitude,
                 'address' => $attende->address ?? ""
             ],
-            'photo' => $attende->photo ?? ""
+            'photo' => is_null($attende->photo) ? "" : env('MEDIA_URL') . Storage::url($attende->photo)
 
         ];
     }
