@@ -44,11 +44,7 @@ class OutstationCreatedNotification extends Notification
         $due_date = Carbon::parse($outstation->due_date)->translatedFormat('l, d F Y');
         return [
             'heading' => "Dinas Luar diajukan!",
-            'body' => "Dinas Luar baru diajukan:
-            \nJudul : $outstation->title
-            \nMulai : $start_date
-            \nSampai : $due_date
-            \nStatus : Menunggu Persetujuan",
+            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus : Menunggu Persetujuan",
         ];
     }
 
@@ -57,13 +53,10 @@ class OutstationCreatedNotification extends Notification
         $outstation = $this->outstation;
         $start_date = Carbon::parse($outstation->start_date)->translatedFormat('l, d F Y');
         $due_date = Carbon::parse($outstation->due_date)->translatedFormat('l, d F Y');
+        sendNotification("Dinas Luar baru diajukan oleh  {$notifiable->name} :\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date", 'Pengajuan Dinas Luar!', 2);
         return [
             'heading' => "Dinas Luar diajukan!",
-            'body' => "Dinas Luar baru diajukan:
-            \nJudul : $outstation->title
-            \nMulai : $start_date
-            \nSampai : $due_date
-            \nStatus : Menunggu Persetujuan",
+            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus : Menunggu Persetujuan",
             'user_id' => $notifiable->id
         ];
     }

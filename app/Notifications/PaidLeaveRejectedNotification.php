@@ -14,15 +14,17 @@ class PaidLeaveRejectedNotification extends Notification
     use Queueable;
 
     private $paidLeave;
+    private $reason;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(PaidLeave $paidLeave)
+    public function __construct(PaidLeave $paidLeave, $reason)
     {
         $this->paidLeave = $paidLeave;
+        $this->reason = $reason;
     }
     /**
      * Get the notification's delivery channels.
@@ -38,9 +40,10 @@ class PaidLeaveRejectedNotification extends Notification
     public function toDatabase($notifiable)
     {
         $cuti = $this->paidLeave;
+        $reason = $this->reason;
         return [
             'heading' => $cuti->kategori->name . " ditolak!",
-            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan : $reason",
         ];
     }
 
@@ -49,7 +52,7 @@ class PaidLeaveRejectedNotification extends Notification
         $cuti = $this->paidLeave;
         return [
             'heading' => $cuti->kategori->name . " ditolak!",
-            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada : " . now()->translatedFormat('l, d F Y H:i:s'),
+            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan : $reason",
             'user_id' => $notifiable->id
         ];
     }

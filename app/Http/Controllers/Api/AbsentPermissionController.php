@@ -109,7 +109,6 @@ class AbsentPermissionController extends Controller
 
         if ($permission) {
             $request->user()->notify(new AbsentPermissionCreatedNotification($permission));
-            sendNotification("Izin baru diajukan oleh  {$request->user()->name} : \n$request->title", 'Pengajuan izin!', 2);
             return setJson(
                 true,
                 'Berhasil',
@@ -157,6 +156,23 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'user_id' => '',
+                'id' => '',
+                'is_approved' => 'required',
+                'reason' => 'required_if:is_approved,0'
+            ],
+            [
+                'reason.required_if' => 'Alasan penolakan harus diisi!'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return setJson(false, 'Gagal', [], 400, $validator->errors());
+        }
+
         $permission = AbsentPermission::where([
             ['id', $request->permission_id],
             ['user_id', $request->user_id]
@@ -169,7 +185,7 @@ class AbsentPermissionController extends Controller
 
         $notification = $permission->is_approved ?
             new AbsentPermissionApprovedNotification($permission) :
-            new AbsentPermissionRejectedNotification($permission);
+            new AbsentPermissionRejectedNotification($permission, $request->reason);
 
         if ($update) {
             $permission->user->notify($notification);

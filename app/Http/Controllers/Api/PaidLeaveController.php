@@ -121,7 +121,6 @@ class PaidLeaveController extends Controller
 
         if ($paid_leave) {
             $request->user()->notify(new PaidLeaveCreatedNotification($paid_leave));
-            sendNotification($category->name . "diajukan oleh {$request->user()->name} :\n$request->title", "Pengajuan $category->name!", 2);
             return setJson(
                 true,
                 'Berhasil',
@@ -163,6 +162,23 @@ class PaidLeaveController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'reason' => 'required_if:is_approved,0',
+                'id' => '',
+                'user_id' => '',
+                'is_approved' => 'required'
+            ],
+            [
+                'reason.required_if' => 'Alasan penolakan harus diisi!'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return setJson(false, 'Gagal', [], 400, $validator->errors());
+        }
+
         $paid_leave = PaidLeave::where([
             ['id', $request->paid_leave_id],
             ['user_id', $request->user_id],
@@ -174,7 +190,7 @@ class PaidLeaveController extends Controller
 
         $notification = $paid_leave->is_approved ?
             new PaidLeaveApprovedNotification($paid_leave) :
-            new PaidLeaveRejectedNotification($paid_leave);
+            new PaidLeaveRejectedNotification($paid_leave, $request->reason);
 
         if ($update) {
             $paid_leave->user->notify($notification);
