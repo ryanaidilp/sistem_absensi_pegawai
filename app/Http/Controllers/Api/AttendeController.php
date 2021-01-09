@@ -3,15 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Attende;
 use App\Models\AttendeCode;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Holiday;
+use App\Notifications\AttendanceCanceledNotification;
 use Illuminate\Support\Facades\Storage;
 use App\Transformers\AttendeTransformers;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Notifications\AttendeStatusUpdatedNotification;
+use App\Transformers\AllUserTransformers;
 
 class AttendeController extends Controller
 {
@@ -113,6 +117,90 @@ class AttendeController extends Controller
                 true,
                 'Sukses melakukan presensi!',
                 fractal()->item($attende)->transformWith(new AttendeTransformers)->serializeWith(new CustomSerializer),
+                200,
+                []
+            );
+        }
+
+        return setJson(false, 'Kesalahan tidak diketahui!', [], 400, ['message' => 'Kesalahan tidak diketahui!']);
+    }
+
+    public function index(Request $request)
+    {
+        $date = today();
+        if ($request->has('date')) {
+            $date = Carbon::parse($request->date);
+        }
+
+        $users =  User::where(function ($query) {
+            return $query->pns()
+                ->orWhere
+                ->honorer();
+        })
+            ->get();
+
+        $users = fractal()->collection($users)
+            ->transformWith(new AllUserTransformers($date))
+            ->serializeWith(new CustomSerializer)
+            ->toArray();
+
+        $holidays = Holiday::whereYear('date', $date)->get()->map(function ($holiday) {
+            return [
+                'date' => $holiday->date,
+                'name' => $holiday->name,
+                'description' => $holiday->description
+            ];
+        })->toArray();
+
+        return setJson(true, 'Berhasil mengambil seluruh data pegawai!', [
+            'employees' => $users,
+            'holidays' => $holidays
+        ], 200, []);
+    }
+
+    public function cancel(Request $request)
+    {
+        if ($request->user()->position !== 'Camat') {
+            return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
+        }
+
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'reason' => 'required',
+                'presence_id' => 'required'
+            ],
+            [
+                'reason.required' => 'Alasan pembatalan harus diisi!'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return setJson(false, 'Gagal', [], 400, $validator->errors());
+        }
+
+        $presence = Attende::where('id', $request->presence_id)->first();
+
+
+        if (Storage::exists($presence->photo)) {
+            Storage::delete($presence->photo);
+        }
+
+        $update  = $presence->update([
+            'attend_time' => null,
+            'attende_status_id' => Attende::ABSENT,
+            'photo' => null,
+            'latitude' => 0,
+            'longitude' => 0,
+            'address' => null
+        ]);
+
+        if ($update) {
+            $presence->pegawai->notify(new AttendanceCanceledNotification($presence, $request->reason));
+            return setJson(
+                true,
+                'Sukses membatalkan presensi!',
+                fractal()->item($presence)->transformWith(new AttendeTransformers)->serializeWith(new CustomSerializer),
                 200,
                 []
             );

@@ -31,6 +31,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('change_password', [UserController::class, 'update_password']);
     Route::get('user', [UserController::class, 'index']);
     Route::post('presence', [AttendeController::class, 'presence']);
+    Route::post('presence/cancel', [AttendeController::class, 'cancel']);
+    Route::get('presence', [AttendeController::class, 'index']);
 
     Route::group(['prefix' => 'notifications'], function () {
         Route::get('/', [UserController::class, 'notifications']);
