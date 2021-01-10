@@ -6,15 +6,16 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Attende;
 use App\Models\Holiday;
+use App\Models\PaidLeave;
 use App\Models\Outstation;
 use App\Models\AttendeCode;
 use Illuminate\Http\Request;
+use App\Models\LeaveCategory;
 use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
-use App\Models\LeaveCategory;
-use App\Models\PaidLeave;
 use App\Transformers\UserTransformer;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\AllUserTransformers;
 use App\Transformers\Serializers\CustomSerializer;
@@ -310,6 +311,8 @@ class UserController extends Controller
                         'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "-",
                         'attend_status' => $attende->status_kehadiran->name,
                         'start_time' => Carbon::parse($start_time)->addMinutes(30)->translatedFormat('Y-m-d H:i:s'),
+                        'photo' => is_null($attende->photo) ? "" : env('MEDIA_URL') . Storage::url($attende->photo),
+                        'address' => $attende->address ?? ""
                     ];
                 })
             ];
