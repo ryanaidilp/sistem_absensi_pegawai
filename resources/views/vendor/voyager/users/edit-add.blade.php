@@ -58,7 +58,7 @@
                         $genders = \App\Models\Gender::all();
                         $selected_department = optional($dataTypeContent->departemen)->id;
                         $departments = \App\Models\Department::all();
-                        $status = ['PNS', 'Honorer'];
+                        $status = ['Admin','PNS', 'Honorer'];
                         $selected_status = optional($dataTypeContent)->status;
                         $golongan = \App\Models\GovernmentEmployeeGroup::all();
                         $selected_golongan = optional($dataTypeContent)->government_employee_group_id;
@@ -97,8 +97,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="status">Golongan</label>
-                            <select class="form-control select2" id="status" name="status">
+                            <label for="government_employee_group_id">Golongan</label>
+                            <select class="form-control select2" id="government_employee_group_id" name="government_employee_group_id">
                                 <option value="">Nothing</option>
                                 @foreach ($golongan as $gol)
                                 <option value="{{ $gol->id }}" {{ ($gol->id == $selected_golongan ? 'selected' : '') }}>{{ $gol->rank }} - {{ $gol->group }}</option>
