@@ -64,7 +64,7 @@ class UserController extends Controller
         $user = User::where('phone', wordwrap($request->phone, 4, " ", true))->with(['presensi', 'dinas_luar', 'izin', 'departemen', 'gender'])->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return setJson(false, 'No handphone/password salah!', [], 400, ['message' => ['Data not found']]);
+            return setJson(false, 'Data tidak ditemukan!', [], 400, ['message' => ['No handphone/password salah']]);
         }
         $nextPresence  = $this->checkNextPresence($user->id);
         $token = $user->createToken($request->device_name)->plainTextToken;
@@ -343,6 +343,8 @@ class UserController extends Controller
 
         $yearly_not_morning_parade = 0;
         $yearly_leave_early = 0;
+        $yearly_early_lunch_break = 0;
+        $yearly_not_come_after_lunch_break = 0;
         foreach ($yearly_not_absent as $daily) {
             foreach ($daily['attendances'] as $attende) {
                 if ($attende['absent_type'] === 'Absen Pagi') {
@@ -353,6 +355,16 @@ class UserController extends Controller
                 if ($attende['absent_type'] === 'Absen Pulang') {
                     if ($attende['attend_status'] == 'Tidak Hadir') {
                         $yearly_leave_early++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Istrahat') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $yearly_early_lunch_break++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Siang') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $yearly_not_come_after_lunch_break++;
                     }
                 }
             }
@@ -371,6 +383,8 @@ class UserController extends Controller
         });
         $monthly_not_morning_parade = 0;
         $monthly_leave_early = 0;
+        $monthly_early_lunch_break = 0;
+        $monthly_not_come_after_lunch_break = 0;
         foreach ($monthly_not_absent as $daily) {
             foreach ($daily['attendances'] as $attende) {
                 if ($attende['absent_type'] === 'Absen Pagi') {
@@ -381,6 +395,16 @@ class UserController extends Controller
                 if ($attende['absent_type'] === 'Absen Pulang') {
                     if ($attende['attend_status'] == 'Tidak Hadir') {
                         $monthly_leave_early++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Istrahat') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $monthly_early_lunch_break++;
+                    }
+                }
+                if ($attende['absent_type'] === 'Absen Siang') {
+                    if ($attende['attend_status'] == 'Tidak Hadir') {
+                        $monthly_not_come_after_lunch_break++;
                     }
                 }
             }
@@ -432,13 +456,17 @@ class UserController extends Controller
                 ],
                 'late_count' => $yearly_late_count,
                 'leave_early_count' => $yearly_leave_early,
-                'not_morning_parade_count' => $yearly_not_morning_parade
+                'not_morning_parade_count' => $yearly_not_morning_parade,
+                'early_lunch_break_count' => $yearly_early_lunch_break,
+                'not_come_after_lunch_break_count' => $yearly_not_come_after_lunch_break
             ],
             'monthly' => [
                 'attendance_percentage' => round($monthly->average('attendance_percentage'), 2),
                 'late_count' => $monthly_late_count,
                 'leave_early_count' => $monthly_leave_early,
-                'not_morning_parade_count' => $monthly_not_morning_parade
+                'not_morning_parade_count' => $monthly_not_morning_parade,
+                'early_lunch_break_count' => $monthly_early_lunch_break,
+                'not_come_after_lunch_break_count' => $monthly_not_come_after_lunch_break
             ],
             'daily' => $daily_formated,
             'holidays' => $holidays
