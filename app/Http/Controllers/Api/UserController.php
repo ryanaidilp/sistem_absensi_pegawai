@@ -220,7 +220,7 @@ class UserController extends Controller
         $month = $request->has('month') ? $request->month : now()->month;
 
         // Get holiday data
-        $holidays = Holiday::whereYear('date', now()->year)->get();
+        $holidays = Holiday::whereYear('date', $year)->get();
         $holidays = $holidays->map(function ($holiday) {
             return [
                 'date' => $holiday->date,
@@ -310,7 +310,7 @@ class UserController extends Controller
                         'absent_type' => $attende->kode_absen->tipe->name,
                         'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "-",
                         'attend_status' => $attende->status_kehadiran->name,
-                        'start_time' => Carbon::parse($start_time)->addMinutes(30)->translatedFormat('Y-m-d H:i:s'),
+                        'start_time' => Carbon::parse($start_time)->translatedFormat('Y-m-d H:i:s'),
                         'photo' => is_null($attende->photo) ? "" : env('MEDIA_URL') . Storage::url($attende->photo),
                         'address' => $attende->address ?? ""
                     ];
