@@ -105,10 +105,18 @@ class User extends \TCG\Voyager\Models\User
             'department' => $this->departemen->name,
             'position' => $this->position,
             'presensi' =>
-            $this->presensi()->with('status_kehadiran')->whereDate('created_at', $date)->get()->map(function ($presensi) {
+            $this->presensi()->with('status_kehadiran')->whereDate('created_at', $date)->get()->map(function ($presensi) use ($date) {
                 // dd($presensi);
+                $status = $presensi->status_kehadiran->name;
+                if ($status === 'Terlambat') {
+                    $date = Carbon::parse($date);
+                    $start_time = Carbon::parse("{$date->format('Y-m-d')} {$presensi->kode_absen->start_time}");
+                    $attend_time = Carbon::parse($presensi->attend_time);
+                    $duration = $start_time->addMinutes(30)->diffInMinutes($attend_time);
+                    $status .= " $duration menit";
+                }
                 return [
-                    'status' => $presensi->status_kehadiran->name,
+                    'status' => $status,
                     'attend_time' => $presensi->attend_time == null ? "-" : Carbon::parse($presensi->attend_time)->format('H:i')
                 ];
             })
