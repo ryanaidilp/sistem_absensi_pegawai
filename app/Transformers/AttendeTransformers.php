@@ -34,7 +34,7 @@ class AttendeTransformers extends TransformerAbstract
      */
     public function transform(Attende $attende)
     {
-        $time = !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "";
+        $time = !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i:s') : "";
         $date = Carbon::parse($attende->created_at);
         return [
             'id' => $attende->id,
