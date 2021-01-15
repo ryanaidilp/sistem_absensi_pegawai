@@ -39,7 +39,7 @@ class NotifyExpiredPermission extends Command
      */
     public function handle()
     {
-        $permissions = AbsentPermission::with(['user'])->whereDate('due_date', '=', today())->get();
+        $permissions = AbsentPermission::with(['user'])->whereDate('due_date', '=', today()->subDay())->get();
         foreach ($permissions as $permission) {
             $permission->user->notify(new AbsentPermissionExpiredNotification($permission));
         }

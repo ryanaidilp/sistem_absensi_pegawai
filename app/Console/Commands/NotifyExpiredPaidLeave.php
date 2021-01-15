@@ -39,7 +39,7 @@ class NotifyExpiredPaidLeave extends Command
      */
     public function handle()
     {
-        $paid_leaves = PaidLeave::with(['user'])->whereDate('due_date', '=', today())->get();
+        $paid_leaves = PaidLeave::with(['user'])->whereDate('due_date', '=', today()->subDay())->get();
         foreach ($paid_leaves as $paid_leave) {
             $paid_leave->user->notify(new PaidLeaveExpiredNotification($paid_leave));
         }

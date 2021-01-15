@@ -44,7 +44,7 @@ class PaidLeaveCreatedNotification extends Notification
         $due_date = Carbon::parse($cuti->due_date)->translatedFormat('l, d F Y');
         return [
             'heading' => $cuti->kategori->name . ' diajukan!',
-            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus : Menunggu Persetujuan"
+            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\{$cuti->kategori->name} diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka {$cuti->kategori->name} akan dibatalkan."
         ];
     }
 
@@ -57,7 +57,7 @@ class PaidLeaveCreatedNotification extends Notification
         return [
             'user_id' => $notifiable->id,
             'heading' => $cuti->kategori->name . ' diajukan!',
-            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus : Menunggu Persetujuan"
+            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\{$cuti->kategori->name} diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka {$cuti->kategori->name} akan dibatalkan."
         ];
     }
 }
