@@ -80,7 +80,7 @@ class OutstationController extends Controller
             'photo' => "dinas_luar/" . $request->user()->name . "/"   . $imageName,
             'due_date' => Carbon::parse($request->due_date),
             'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => $request->user()->position === 'Camat' ? true : false
+            'is_approved' => true
         ]);
 
         if ($outstation) {
