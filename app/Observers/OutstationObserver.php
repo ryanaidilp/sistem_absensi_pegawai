@@ -16,14 +16,7 @@ class OutstationObserver
      */
     public function created(Outstation $outstation)
     {
-        if (Carbon::parse($outstation->start_date)->isToday()) {
-            $presences = $outstation->user->presensi()->today()->absen()->get();
-            foreach ($presences as $presence) {
-                $presence->update([
-                    'attende_status_id' => Attende::OUTSTATION
-                ]);
-            }
-        }
+        $this->updateStatus(Attende::ABSENT, Attende::OUTSTATION, $outstation);
     }
 
     /**
@@ -60,6 +53,19 @@ class OutstationObserver
             $presence->update([
                 'attende_status_id' => $to
             ]);
+        }
+    }
+
+    /**
+     * Handle the Outstation "deleted" event.
+     *
+     * @param  \App\Models\Outstation  $outstation
+     * @return void
+     */
+    public function deleted(Outstation $outstation)
+    {
+        if ($outstation->is_approved) {
+            $this->updateStatus(Attende::OUTSTATION, Attende::ABSENT, $outstation);
         }
     }
 }
