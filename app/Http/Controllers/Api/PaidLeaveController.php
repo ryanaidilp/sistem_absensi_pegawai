@@ -116,7 +116,7 @@ class PaidLeaveController extends Controller
             'photo' => $path,
             'start_date' => Carbon::parse($request->start_date),
             'due_date' => Carbon::parse($request->due_date),
-            'is_approved' => $request->user()->position === 'Camat' ? true : false
+            'is_approved' => true
         ]);
 
         if ($paid_leave) {
