@@ -110,10 +110,15 @@ class User extends \TCG\Voyager\Models\User
                 $status = $presensi->status_kehadiran->name;
                 if ($status === 'Terlambat') {
                     $date = Carbon::parse($date);
-                    $start_time = Carbon::parse("{$date->format('Y-m-d')} {$presensi->kode_absen->start_time}");
+                    $start_time = Carbon::parse("{$date->format('Y-m-d')} {$presensi->kode_absen->start_time}")->addMinutes(30);
                     $attend_time = Carbon::parse($presensi->attend_time);
-                    $duration = $start_time->addMinutes(30)->diffInMinutes($attend_time);
+                    $duration = $start_time->diffInMinutes($attend_time);
                     $status .= " $duration menit";
+                    if ($duration === 0) {
+                        $status = $presensi->status_kehadiran->name;
+                        $duration = $start_time->diffInSeconds($attend_time);
+                        $status .= " $duration detik";
+                    }
                 }
                 return [
                     'status' => $status,

@@ -39,7 +39,7 @@ class NotifyExpiredOutstation extends Command
      */
     public function handle()
     {
-        $outstations = Outstation::with(['user'])->whereDate('due_date', '=', today())->get();
+        $outstations = Outstation::with(['user'])->whereDate('due_date', '=', today()->subDay())->get();
         foreach ($outstations as $outstation) {
             $outstation->user->notify(new OutstationExpiredNotification($outstation));
         }

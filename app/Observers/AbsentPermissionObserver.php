@@ -17,14 +17,7 @@ class AbsentPermissionObserver
      */
     public function created(AbsentPermission $absentPermission)
     {
-        if (Carbon::parse($absentPermission->start_date)->isToday()) {
-            $presences = $absentPermission->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
-            foreach ($presences as $presence) {
-                $presence->update([
-                    'attende_status_id' => Attende::PERMISSION
-                ]);
-            }
-        }
+        $this->updateStatus(Attende::ABSENT, Attende::PERMISSION, $absentPermission);
     }
 
     /**
@@ -73,7 +66,9 @@ class AbsentPermissionObserver
      */
     public function deleted(AbsentPermission $absentPermission)
     {
-        //
+        if ($absentPermission->is_approved) {
+            $this->updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
+        }
     }
 
     /**

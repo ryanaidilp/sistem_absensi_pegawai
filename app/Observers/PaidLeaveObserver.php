@@ -20,14 +20,7 @@ class PaidLeaveObserver
     {
         $category = LeaveCategory::where('id', $paidLeave->leave_category_id)->first();
         $status = AttendeStatus::where('name', $category->name)->first();
-        if (Carbon::parse($paidLeave->start_date)->isToday()) {
-            $presences = $paidLeave->user->presensi()->whereDate('created_at', today())->where('attende_status_id', Attende::ABSENT)->get();
-            foreach ($presences as $presence) {
-                $presence->update([
-                    'attende_status_id' => $status->id
-                ]);
-            }
-        }
+        $this->updateStatus(Attende::ABSENT, $status->id, $paidLeave);
     }
 
     /**
@@ -78,7 +71,11 @@ class PaidLeaveObserver
      */
     public function deleted(PaidLeave $paidLeave)
     {
-        //
+        $category = LeaveCategory::where('id', $paidLeave->leave_category_id)->first();
+        $status = AttendeStatus::where('name', $category->name)->first();
+        if ($paidLeave->is_approved) {
+            $this->updateStatus($status->id, Attende::ABSENT, $paidLeave);
+        }
     }
 
     /**
