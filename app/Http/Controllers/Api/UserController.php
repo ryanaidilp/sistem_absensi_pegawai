@@ -308,7 +308,7 @@ class UserController extends Controller
                     );
                     return [
                         'absent_type' => $attende->kode_absen->tipe->name,
-                        'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i') : "-",
+                        'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i:s') : "-",
                         'attend_status' => $attende->status_kehadiran->name,
                         'start_time' => Carbon::parse($start_time)->translatedFormat('Y-m-d H:i:s'),
                         'photo' => is_null($attende->photo) ? "" : env('MEDIA_URL') . Storage::url($attende->photo),
