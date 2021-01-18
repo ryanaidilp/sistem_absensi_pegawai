@@ -56,7 +56,7 @@ class OutstationCreatedNotification extends Notification
         sendNotification("Dinas Luar baru diajukan oleh  {$notifiable->name} :\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date", 'Pengajuan Dinas Luar!', 2);
         return [
             'heading' => "Dinas Luar diajukan!",
-            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\Dinas Luar diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka Dinas Luar akan dibatalkan.",
+            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nDinas Luar diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka Dinas Luar akan dibatalkan.",
             'user_id' => $notifiable->id
         ];
     }

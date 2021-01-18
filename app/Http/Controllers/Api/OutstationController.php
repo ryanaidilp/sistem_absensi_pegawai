@@ -24,7 +24,7 @@ class OutstationController extends Controller
      */
     public function index(Request $request)
     {
-        $outstations = Outstation::where('user_id', $request->user()->id)->get();
+        $outstations = Outstation::where('user_id', $request->user()->id)->latest()->get();
         $outstations = fractal()
             ->collection($outstations, new OutstationTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -62,9 +62,11 @@ class OutstationController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $outstation = Outstation::whereDate('start_date', now())->first();
+        $outstation = Outstation::whereDate('start_date', Carbon::parse($request->start_date))
+            ->where('user_id', $request->user()->id)
+            ->first();
 
-        if ($outstation) {
+        if (!is_null($outstation)) {
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan dinas luar tertanggal ' . now()->translatedFormat('l, d F Y')]]);
         }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Attende;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
 function setJson($success, $message, $data, $statusCode, $errors = [])
@@ -75,4 +76,23 @@ function checkAttendancePercentage($status)
         default:
             return 0;
     }
+}
+
+function calculateLateTime($start_time, $attend_time, $date)
+{
+    $date = Carbon::parse($date);
+    $start_time = Carbon::parse("{$date->format('Y-m-d')} {$start_time}")->addMinutes(30);
+    $attend_time = Carbon::parse($attend_time);
+    $duration = $start_time->diffInMinutes($attend_time);
+    if ($duration > 59) {
+        $duration = $start_time->diffInHours($attend_time);
+        return " $duration jam";
+    }
+
+    if ($duration === 0) {
+        $duration = $start_time->diffInSeconds($attend_time);
+        return " $duration detik";
+    }
+
+    return " $duration menit";
 }

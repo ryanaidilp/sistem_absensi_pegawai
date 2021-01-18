@@ -24,7 +24,7 @@ class AbsentPermissionController extends Controller
      */
     public function index(Request $request)
     {
-        $permissions = AbsentPermission::where('user_id', $request->user()->id)->get();
+        $permissions = AbsentPermission::where('user_id', $request->user()->id)->latest()->get();
         $permissions = fractal()
             ->collection($permissions, new AbsentPermissionTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -63,7 +63,9 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $permission = AbsentPermission::whereDate('start_date', now())->first();
+        $permission = AbsentPermission::whereDate('start_date', Carbon::parse($request->start_date))
+            ->where('user_id', $request->user()->id)
+            ->first();
 
         if ($permission) {
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan izin tertanggal ' . now()->translatedFormat('l, d F Y')]]);

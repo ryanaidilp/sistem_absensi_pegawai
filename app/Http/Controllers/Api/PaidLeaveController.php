@@ -26,7 +26,7 @@ class PaidLeaveController extends Controller
      */
     public function index(Request $request)
     {
-        $paid_leaves = PaidLeave::where('user_id', $request->user()->id)->get();
+        $paid_leaves = PaidLeave::where('user_id', $request->user()->id)->latest()->get();
         $paid_leaves = fractal()
             ->collection($paid_leaves, new PaidLeaveTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -71,7 +71,9 @@ class PaidLeaveController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $paid_leave = PaidLeave::whereDate('start_date', $request->start_date)->first();
+        $paid_leave = PaidLeave::whereDate('start_date', Carbon::parse($request->start_date))
+            ->where('user_id', $request->user()->id)
+            ->first();
 
         if ($paid_leave) {
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan cuti tertanggal ' . Carbon::parse($request->start_date)->translatedFormat('l, d F Y')]]);
