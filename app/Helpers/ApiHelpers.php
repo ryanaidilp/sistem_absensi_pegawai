@@ -49,8 +49,16 @@ function sendNotification($body, $heading, $userId = null)
     ])->retry(3, 1000)->post(env('ONESIGNAL_API_URL'), $fields);
 }
 
-function getDistance($latitude1, $longitude1, $latitude2 = -0.0497952, $longitude2 = 119.8804039)
+function getDistance($latitude1, $longitude1, $latitude2 = null, $longitude2 = null)
 {
+    if (is_null($latitude2)) {
+        $latitude2 = env('LATITUDE_OFFSET');
+    }
+
+    if (is_null($longitude2)) {
+        $longitude2 = env('LONGITUDE_OFFSET');
+    }
+
     $degrees = rad2deg(acos((sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($longitude1 - $longitude2)))));
 
     $distance = $degrees * 111.13384;
