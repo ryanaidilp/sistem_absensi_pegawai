@@ -1,12 +1,20 @@
 // Fonts
 @import url('https://fonts.googleapis.com/css?family=Nunito');
 
-// Variables
-@import 'variables';
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@tailwind base;
 
+@tailwind components;
+
+@tailwind utilities;
+
+.btn {
+    @apply inline-block px-4 py-2 text-sm text-white transition-all duration-150 rounded shadow-lg;
+}
+
+.btn-primary {
+    @apply bg-blue-500 hover:bg-blue-600;
+}
 
 .dataTables_wrapper select,
 .dataTables_wrapper .dataTables_filter input {

@@ -2,13 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AttendeCode;
-use App\Models\Holiday;
-use App\Models\User;
-use Carbon\Carbon;
 use DateInterval;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\User;
+use App\Models\Holiday;
+use App\Models\Attende;
+use App\Models\PaidLeave;
+use App\Models\Outstation;
+use App\Models\AttendeCode;
+use Illuminate\Http\Request;
+use App\Models\AbsentPermission;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MainController extends Controller
@@ -70,17 +76,58 @@ class MainController extends Controller
 
     public function export(Request $request)
     {
-        $date = ($request->date) ? Carbon::parse($request->date) : today();
-        $pns = User::with(['presensi', 'departemen'])->pns()->get();
-        $honorer = User::with(['presensi', 'departemen'])->honorer()->get();
+        $date = $request->has('date') ? Carbon::parse($request->date) : today();
+        $attendes = Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'pegawai.departemen'])->whereDate('created_at', $date)->get();
+        $attendes = $attendes->groupBy('user_id');
+        $attendes = $attendes->map(function ($attende) use ($date) {
+            $user = $attende->first()->pegawai;
+            $presence = $attende->map(function ($data) use ($date) {
+                $status = $data->status_kehadiran->name;
+                if ($status === 'Terlambat') {
+                    $status = $data->status_kehadiran->name;
+                    $status .= calculateLateTime($data->kode_absen->start_time, $data->attend_time, $date);
+                }
+                return [
+                    'status' => $status,
+                    'attend_time' => $data->attend_time == null ? "-" : Carbon::parse($data->attend_time)->format('H:i')
+                ];
+            });
+            return [
+                'name' => $user->name,
+                'status' => $user->status,
+                'nip' => $user->nip,
+                'department' => $user->departemen->name,
+                'position' => $user->position,
+                'presensi' => $presence
+            ];
+        });
+        $attendes = $attendes->values();
+        $pns = $attendes->filter(function ($user) {
+            return $user['status'] === 'PNS';
+        });
+        $honorer = $attendes->filter(function ($user) {
+            return $user['status'] === 'Honorer';
+        });
+        $izin = AbsentPermission::with(['user'])->whereDate('start_date', '<=', $date)
+            ->whereDate('due_date', '>=', $date)->get();
+        $cuti = PaidLeave::with(['user'])->whereDate('start_date', '<=', $date)
+            ->whereDate('due_date', '>=', $date)->get();
+        $dinas = Outstation::with(['user'])->whereDate('start_date', '<=', $date)
+            ->whereDate('due_date', '>=', $date)->get();
+
+        $leaves = array();
+
+        $leaves = $this->formatLeave($leaves, $izin);
+        $leaves = $this->formatLeave($leaves, $cuti);
+        $leaves = $this->formatLeave($leaves, $dinas);
+
+
         return Inertia::render('Table/Index', [
-            'pns' => $pns->map(function ($pegawai) use ($date) {
-                return $pegawai->format($date);
-            }),
-            'honorer' => $honorer->map(function ($pegawai) use ($date) {
-                return $pegawai->format($date);
-            }),
-            'date' => $date->translatedFormat("l, d F Y")
+            'pns' => $pns->values(),
+            'honorer' => $honorer->values(),
+            'leaves' => $leaves,
+            'date' => $date->translatedFormat("l, d F Y"),
+            'str_date' => $date->format('Y-m-d')
         ]);
     }
 
@@ -94,10 +141,51 @@ class MainController extends Controller
         } else if (now()->hour >= 13 && now()->hour < 18) {
             $deadline = Carbon::parse($attendeCode[3]->start_time);
         } else if (now()->hour >= 0 && now()->hour < 8) {
-            $deadline = Carbon::parse("07:30");
+            $deadline = Carbon::parse("07:00");
         } else {
             $deadline = Carbon::parse("07:30")->addDays($days);
         }
         return $deadline;
+    }
+
+    private function formatLeave($leaves, $items)
+    {
+
+        foreach ($items as $item) {
+            $type = '';
+            switch (class_basename($item)) {
+                case 'AbsentPermission':
+                    $type = 'Izin';
+                    break;
+                case 'Outstation':
+                    $type = 'Dinas Luar';
+                    break;
+                case 'PaidLeave':
+                    $type = 'Cuti';
+                    break;
+            }
+            $position = $item->user->position;
+            if (
+                $position !== 'Camat' &&
+                $position !== 'Driver Camat' &&
+                $position !== 'Sekcam' &&
+                $position !== 'Bendahara'
+            ) {
+                $position = $item->user->position . ' - ' . $item->user->departemen->name;
+            }
+            array_push($leaves, [
+                'id' => $item->id,
+                'title' => $item->title,
+                'description' => $item->description,
+                'type' => $type,
+                'user' => $item->user->name,
+                'position' => $position,
+                'is_approved' => $item->is_approved ? true : false,
+                'start_date' => Carbon::parse($item->start_date)->translatedFormat('l, d F Y'),
+                'due_date' => Carbon::parse($item->due_date)->translatedFormat('l, d F Y'),
+                'photo' => env('MEDIA_URL') . Storage::url($item->photo)
+            ]);
+        }
+        return $leaves;
     }
 }

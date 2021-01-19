@@ -1,59 +1,47 @@
 <template>
   <div
-    class="p-4 align-middle d-flex justify-content-center flex-column"
+    class="flex flex-col justify-center w-full min-h-screen p-4 mx-auto"
   >
-    <h1 class="text-center font-weight-bold">
-      Sistem Presensi Online
+    <p class="mb-4 text-3xl font-bold text-center">
+      Sistem Absensi Pegawai Online
       <br />
-      Pegawai Kantor Camat Balaesang
-    </h1>
-    <div
-      class="mt-4 justify-content-center d-flex flex-column container-md"
-      v-if="holiday.is_holiday"
-    >
-      <p class="text-center h5 text-muted">Libur Nasional</p>
-      <br>
+      Kantor Camat Balaesang
+    </p>
+    <div class="flex flex-col justify-center mt-4" v-if="holiday.is_holiday">
+      <p class="text-center text-muted">Libur Nasional</p>
+      <br />
       <p class="text-center">{{ holiday.name }}</p>
       <img
-        style="width: 30%"
         :src="route('landing') + 'assets/images/weekend_placeholder.png'"
-        class="ml-auto mr-auto img d-block img-fluid"
+        class="object-cover h-64 mx-auto"
       />
       <p class="text-center">Tidak ada jadwal kantor hari ini</p>
     </div>
     <div
       v-else-if="!weekend"
-      class="justify-content-center d-flex flex-column container-md"
+      class="flex flex-col items-center justify-center w-full"
     >
-      <div
-        v-if="code != null"
-        class="mt-2 justify-content-center d-flex flex-column container-md"
-      >
+      <div v-if="code != null" class="flex flex-col justify-center mt-2">
         <flip-countdown
           @timeElapsed="refreshPage()"
           :labels="labels"
           :deadline="formattedTime"
         />
-        <p class="text-center h5 text-muted">
-          <span class="text-uppercase text-dark font-weight-bold">{{
-            code.type
-          }}</span>
+        <p class="my-4 text-center text-gray-500">
+          <span class="font-bold text-black uppercase">{{ code.type }}</span>
           <br />
           {{ code.date }}
           <br />
           {{ code.start_time }} - {{ code.end_time }}
         </p>
         <p class="text-center"></p>
-        <img :src="code.code" class="ml-auto mr-auto img img-fluid" />
-        <p class="mt-2 text-center text-muted font-italic">
+        <img :src="code.code" class="object-contain mx-auto" />
+        <p class="my-2 italic text-center text-gray-500">
           Scan Disini untuk melakukan presensi
         </p>
       </div>
-      <div
-        class="justify-content-center d-flex flex-column container-md"
-        v-else
-      >
-        <p class="text-center h5 text-muted">Presensi selanjutnya</p>
+      <div class="flex flex-col" v-else>
+        <p class="mb-4 text-center text-muted">Presensi selanjutnya</p>
         <flip-countdown
           @timeElapsed="refreshPage()"
           :labels="labels"
@@ -61,33 +49,31 @@
         />
         <img
           :src="route('landing') + 'assets/images/not_found_placeholder.png'"
-          style="width: 30%; display: block"
-          class="ml-auto mr-auto img img-fluid"
+          class="object-cover h-64 mx-auto"
         />
         <p class="text-center">Belum bisa melakukan presensi</p>
       </div>
-      <div class="mt-2 justify-content-center d-flex">
+      <div class="justify-center mx-auto mt-4">
         <inertia-link
           :href="route('print')"
-          class="shadow shadow-lg btn btn-primary"
+          class="btn-primary btn"
           >Unduh Data Presensi</inertia-link
         >
       </div>
     </div>
     <div
-      class="mt-4 justify-content-center d-flex flex-column container-md"
+      class="flex flex-col justify-center w-full mt-4"
       v-else
     >
-      <p class="text-center h5 text-muted">Hari kerja selanjutnya</p>
+      <p class="text-center text-gray-500">Hari kerja selanjutnya</p>
       <flip-countdown
         @timeElapsed="refreshPage()"
         :labels="labels"
         :deadline="formattedTime"
       />
       <img
-        style="width: 30%"
         :src="route('landing') + 'assets/images/weekend_placeholder.png'"
-        class="ml-auto mr-auto img d-block img-fluid"
+        class="object-cover h-64 mx-auto"
       />
       <p class="text-center">Tidak ada jadwal kantor hari ini</p>
     </div>
@@ -114,8 +100,8 @@ export default {
     },
     holiday: {
       type: Object,
-      default: () => {}
-    }
+      default: () => {},
+    },
   },
   data() {
     return {
@@ -146,7 +132,7 @@ export default {
     },
   },
   mounted() {
-    this.updater()
+    this.updater();
   },
 };
 </script>

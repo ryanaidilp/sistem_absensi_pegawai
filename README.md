@@ -4,7 +4,7 @@
 Sistem Absensi Pegawai (SIAP)
 </h1>
 
-Website berisi *API Backend* dan manajemen data pegawai untuk aplikasi **[SIAP](https://github.com/ryanaidilp/sistem_absensi_pegawai_app)**. Website ini dibangun dengan [Laravel](https://laravel.com), [Bootstrap](https://getbootstrap.com), [Vue JS](https://vuejs.org), dan [Inertia JS](https://inertiajs.com). Website ini juga memiliki halaman absensi (QR Code) dan tabel untuk menampilkan data kehadiran pegawai.
+Website berisi *API Backend* dan manajemen data pegawai untuk aplikasi **[SIAP](https://github.com/ryanaidilp/sistem_absensi_pegawai_app)**. Website ini dibangun dengan [Laravel](https://laravel.com), [Tailwind CSS](https://tailwindcss.com/), [Vue JS](https://vuejs.org), dan [Inertia JS](https://inertiajs.com). Website ini juga memiliki halaman absensi (QR Code) dan tabel untuk menampilkan data kehadiran pegawai.
 
 <p align="center">
 <img src="https://i.ibb.co/rGYjC8F/image.png"/>
@@ -20,7 +20,7 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 ## Feature
 
 * Halaman absensi yang menampilkan ***QR Code*** untuk di-*scan* oleh pegawai menggunakan aplikasi [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap) Android.
-* Halaman tabel yang menampilkan data kehadiran pegawai (PNS & Honorer).
+* Halaman cetak yang menampilkan tabel data kehadiran pegawai (PNS & Honorer). Halaman ini juga menampilkan daftar Izin, Dinas Luar, dan Cuti di hari berjalan.
 * Halaman administrator menggunakan [Voyager](https://voyager.devdojo.com/)
 
 ## Konfigurasi
