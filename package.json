@@ -36,6 +36,7 @@
         "@inertiajs/inertia": "^0.8.2",
         "@inertiajs/inertia-vue": "^0.4.3",
         "@inertiajs/progress": "^0.2.4",
-        "portal-vue": "^2.1.7"
+        "portal-vue": "^2.1.7",
+        "v-viewer": "^1.5.1"
     }
 }
