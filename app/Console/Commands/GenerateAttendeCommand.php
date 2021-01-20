@@ -2,15 +2,16 @@
 
 namespace App\Console\Commands;
 
+use App\Models\User;
 use App\Models\Attende;
 use App\Models\AttendeCode;
 use App\Models\AttendeStatus;
-use App\Models\LeaveCategory;
-use App\Models\User;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Console\Command;
 
 class GenerateAttendeCommand extends Command
 {
+    private $userRepository;
     /**
      * The name and signature of the console command.
      *
@@ -30,9 +31,10 @@ class GenerateAttendeCommand extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(UserRepositoryInterface $userRepository)
     {
         parent::__construct();
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -42,7 +44,7 @@ class GenerateAttendeCommand extends Command
      */
     public function handle()
     {
-        $users = User::pns()->orWhere->honorer()->get();
+        $users = $this->userRepository->all();
         $codes = AttendeCode::whereDate('created_at', today())->get();
         if ($codes->count() > 0) {
             foreach ($codes as $code) {

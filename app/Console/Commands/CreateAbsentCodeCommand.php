@@ -2,14 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Models\AttendeCode;
-use App\Models\AttendeType;
 use App\Models\Holiday;
 use Illuminate\Support\Str;
+use App\Models\AttendeType;
+use App\Models\AttendeCode;
 use Illuminate\Console\Command;
+use App\Repositories\Interfaces\HolidayRepositoryInterface;
 
 class CreateAbsentCodeCommand extends Command
 {
+
+    private $holidayRepository;
     /**
      * The name and signature of the console command.
      *
@@ -29,9 +32,10 @@ class CreateAbsentCodeCommand extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(HolidayRepositoryInterface $holidayRepository)
     {
         parent::__construct();
+        $this->holidayRepository = $holidayRepository;
     }
 
     /**
@@ -46,12 +50,12 @@ class CreateAbsentCodeCommand extends Command
 
         $types = AttendeType::all();
 
-        $holiday = Holiday::whereDate('date', today())->first();
+        $holiday = $this->holidayRepository->getToday();
 
         if (!$holiday) {
             foreach ($types as $type) {
                 do {
-                    $code = Str::random(8);
+                    $code = Str::random(rand(8, 16));
                     $attendeCode = AttendeCode::where('code', $code)->first();
                 } while (!is_null($attendeCode));
                 $start_time = [
