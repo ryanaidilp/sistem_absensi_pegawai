@@ -3,22 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Attende;
-use App\Models\AttendeCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Holiday;
-use App\Notifications\AttendanceCanceledNotification;
-use Illuminate\Support\Facades\Storage;
 use App\Transformers\AttendeTransformers;
 use Illuminate\Support\Facades\Validator;
+use App\Repositories\AttendeCodeRepository;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Notifications\AttendeStatusUpdatedNotification;
-use App\Transformers\AllUserTransformers;
+use App\Repositories\Interfaces\AttendeRepositoryInterface;
+use App\Repositories\Interfaces\HolidayRepositoryInterface;
 
 class AttendeController extends Controller
 {
+
+    private $attendeRepository;
+    private $holidayRepository;
+    private $attendeCodeRepository;
+
+    public function __construct(
+        AttendeRepositoryInterface $attendeRepository,
+        HolidayRepositoryInterface $holidayRepository,
+        AttendeCodeRepository $attendeCodeRepository
+    ) {
+        $this->attendeRepository = $attendeRepository;
+        $this->holidayRepository = $holidayRepository;
+        $this->attendeCodeRepository = $attendeCodeRepository;
+    }
+
     public function presence(Request $request)
     {
 
@@ -43,28 +55,31 @@ class AttendeController extends Controller
 
         $distance = getDistance($request->latitude, $request->longitude);
         if ($distance > 0.5) {
+            Log::notice("user: {$request->user()->name}\njarak: $distance\nlokasi:{$request->address}");
             $distance = number_format($distance, 2, ',', '.');
-            return setJson(false, "Sistem mendeteksi anda berada $distance km dari kantor!", [], 400, ['message' => "Lokasi tidak sesuai"]);
+            sendNotification("Percobaan absen diluar kantor:\nPegawai : {$request->user()->name}\nJarak : $distance km\nLokasi :\n{$request->address}", 'Pelanggaran terdeteksi!', 2);
+            return setJson(false, "Lokasi tidak sesuai", [], 400, ['message' => "Sistem mendeteksi anda berada $distance km dari kantor!"]);
         }
 
-        $code = AttendeCode::where('code', $request->code)->first();
+        $code = $this->attendeCodeRepository->getByCode($request->code);
 
         if (!$code) {
-            return setJson(false, 'Kode absen tidak valid!', [], 404, ['message' => 'Kode absen tidak valid!']);
+            return setJson(false, 'Gagal!', [], 404, ['message' => 'Kode absen tidak valid!']);
         }
 
         if (Carbon::parse($code->end_time) <= now()) {
-            return setJson(false, 'Kode absen sudah tidak dapat digunakan!', [], 400, ['message' => 'Kode absen sudah tidak dapat digunakan!']);
+            Log::notice("user: {$request->user()->name}\nPaksa masuk absen yang sudah selesai");
+            sendNotification("Percobaan absen yang sudah selesai:\nPegawai : {$request->user()->name}\nAbsen : {$code->tipe->name}", 'Pelanggaran terdeteksi!', 2);
+            return setJson(false, 'Gagal!', [], 400, ['message' => 'Kode absen sudah tidak dapat digunakan!']);
         }
 
         if (Carbon::parse($code->start_time) >= now()) {
-            return setJson(false, 'Tidak boleh melakukan presensi diluar jadwal!', [], 400, ['message' => 'Tidak boleh melakukan presensi diluar jadwal!']);
+            Log::notice("user: {$request->user()->name}\nAbsen diluar waktu");
+            sendNotification("Percobaan absen yang belum mulai:\nPegawai : {$request->user()->name}\nAbsen : {$code->tipe->name}", 'Pelanggaran terdeteksi!', 2);
+            return setJson(false, 'Pelanggaran!', [], 400, ['message' => 'Tidak boleh melakukan presensi diluar jadwal!']);
         }
 
-        $attende = Attende::where([
-            ['user_id', '=', $request->user()->id],
-            ['attende_code_id', '=', $code->id],
-        ])->first();
+        $attende = $this->attendeRepository->getByUserAndCode($request->user()->id, $code->id);
 
         if (!$attende) {
             return setJson(false, 'Data presensi tidak ditemukan!', [], 404, ['message' => 'Data presensi tidak ditemukan!']);
@@ -74,42 +89,7 @@ class AttendeController extends Controller
             return setJson(false, 'Anda sudah melakukan presensi!', [], 400, ['message' => 'Anda sudah melakukan presensi!']);
         }
 
-
-        $checkForLate = [
-            AttendeCode::MORNING => true,
-            AttendeCode::LUNCH_BREAK => false,
-            AttendeCode::AFTERNOON => true,
-            AttendeCode::EVENING => false
-        ][$code->code_type_id];
-
-        $status = Attende::ON_TIME;
-
-        if ($checkForLate) {
-            $timeTolerance = [
-                AttendeCode::MORNING => 30,
-                AttendeCode::AFTERNOON => 30,
-            ][$code->code_type_id];
-            if (now() <= Carbon::parse($code->end_time)->subMinutes($timeTolerance)) {
-                $status = Attende::ON_TIME;
-            } else {
-                $status = Attende::LATE;
-            }
-        }
-
-
-        $realImage = base64_decode($request->photo);
-        $imageName = now()->format('d_m_Y') . "-" . $request->file_name;
-
-        Storage::disk('public')->put("presensi/" . $request->user()->name . "/" . $code->tipe->name . "/$imageName",  $realImage);
-
-        $update = $attende->update([
-            'attend_time' => now(),
-            'attende_status_id' => $status,
-            'photo' => "presensi/" . $request->user()->name  . "/" . $code->tipe->name . "/$imageName",
-            'latitude' => $request->latitude,
-            'longitude' => $request->longitude,
-            'address' => $request->address
-        ]);
+        $update = $this->attendeRepository->presence($request, $code, $attende);
 
         if ($update) {
             $request->user()->notify(new AttendeStatusUpdatedNotification($attende));
@@ -127,30 +107,11 @@ class AttendeController extends Controller
 
     public function index(Request $request)
     {
-        $date = today();
-        if ($request->has('date')) {
-            $date = Carbon::parse($request->date);
-        }
+        $date = $request->has('date') ? Carbon::parse($request->date) : today();
+        $attendes = $this->attendeRepository->getByDate($date);
+        $users = $this->attendeRepository->formatUserAttendes($attendes);
 
-        $users =  User::where(function ($query) {
-            return $query->pns()
-                ->orWhere
-                ->honorer();
-        })
-            ->get();
-
-        $users = fractal()->collection($users)
-            ->transformWith(new AllUserTransformers($date))
-            ->serializeWith(new CustomSerializer)
-            ->toArray();
-
-        $holidays = Holiday::whereYear('date', $date)->get()->map(function ($holiday) {
-            return [
-                'date' => $holiday->date,
-                'name' => $holiday->name,
-                'description' => $holiday->description
-            ];
-        })->toArray();
+        $holidays = $this->holidayRepository->getByYear($date);
 
         return setJson(true, 'Berhasil mengambil seluruh data pegawai!', [
             'employees' => $users,
@@ -179,28 +140,13 @@ class AttendeController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $presence = Attende::where('id', $request->presence_id)->first();
-
-
-        if (Storage::exists($presence->photo)) {
-            Storage::delete($presence->photo);
-        }
-
-        $update  = $presence->update([
-            'attend_time' => null,
-            'attende_status_id' => Attende::ABSENT,
-            'photo' => null,
-            'latitude' => 0,
-            'longitude' => 0,
-            'address' => null
-        ]);
+        $update = $this->attendeRepository->cancel($request->presence_id, $request->reason);
 
         if ($update) {
-            $presence->pegawai->notify(new AttendanceCanceledNotification($presence, $request->reason));
             return setJson(
                 true,
                 'Sukses membatalkan presensi!',
-                fractal()->item($presence)->transformWith(new AttendeTransformers)->serializeWith(new CustomSerializer),
+                'Berhasil',
                 200,
                 []
             );

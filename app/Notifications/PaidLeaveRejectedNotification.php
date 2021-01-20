@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\PaidLeave;
-use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class PaidLeaveRejectedNotification extends Notification
 {
@@ -50,6 +50,7 @@ class PaidLeaveRejectedNotification extends Notification
     public function toOneSignal($notifiable)
     {
         $cuti = $this->paidLeave;
+        $reason = $this->reason;
         return [
             'heading' => $cuti->kategori->name . " ditolak!",
             'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan : $reason",

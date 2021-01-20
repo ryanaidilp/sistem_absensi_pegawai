@@ -175,7 +175,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
-        App\Providers\ModelEventServiceProvider::class
+        App\Providers\ModelEventServiceProvider::class,
+        App\Providers\RepositoryServiceProvider::class
 
     ],
 

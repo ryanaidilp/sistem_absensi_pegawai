@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use Carbon\Carbon;
-use App\Models\Outstation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\OutstationTransformer;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Transformers\EmployeeOutstationTransformer;
-use App\Notifications\OutstationCreatedNotification;
-use App\Notifications\OutstationRejectedNotification;
-use App\Notifications\OutstationApprovedNotification;
+use App\Repositories\Interfaces\OutstationRepositoryInterface;
 
 class OutstationController extends Controller
 {
+    private $outstationRepository;
+
+    public function __construct(OutstationRepositoryInterface $outstationRepository)
+    {
+        $this->outstationRepository = $outstationRepository;
+    }
     /**
      * Display a listing of the outstations.
      *
@@ -24,7 +25,7 @@ class OutstationController extends Controller
      */
     public function index(Request $request)
     {
-        $outstations = Outstation::where('user_id', $request->user()->id)->latest()->get();
+        $outstations = $this->outstationRepository->getByUser($request->user()->id);
         $outstations = fractal()
             ->collection($outstations, new OutstationTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -62,37 +63,19 @@ class OutstationController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $outstation = Outstation::whereDate('start_date', Carbon::parse($request->start_date))
-            ->where('user_id', $request->user()->id)
-            ->first();
+        $outstation = $this->outstationRepository->getByUserAndStartDate($request->user()->id, $request->start_date);
 
         if (!is_null($outstation)) {
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan dinas luar tertanggal ' . now()->translatedFormat('l, d F Y')]]);
         }
 
-        $realImage = base64_decode($request->photo);
-        $imageName = $request->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
-
-        Storage::disk('public')->put("dinas_luar/" . $request->user()->name . "/"   . $imageName,  $realImage);
-
-        $outstation = Outstation::create([
-            'user_id' => $request->user()->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'photo' => "dinas_luar/" . $request->user()->name . "/"   . $imageName,
-            'due_date' => Carbon::parse($request->due_date),
-            'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => true
-        ]);
+        $outstation = $this->outstationRepository->save($request);
 
         if ($outstation) {
-            $request->user()->notify(new OutstationCreatedNotification($outstation));
             return setJson(
                 true,
                 'Berhasil',
-                fractal()->item($outstation)
-                    ->transformWith(new OutstationTransformer)
-                    ->serializeWith(new CustomSerializer)->toArray(),
+                'Berhasil mengajukan Dinas Luar',
                 201,
                 []
             );
@@ -113,7 +96,7 @@ class OutstationController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
-        $outstations = Outstation::orderBy('created_at', 'desc')->get();
+        $outstations = $this->outstationRepository->all();
         $outstations = fractal()->collection($outstations, new EmployeeOutstationTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
 
@@ -152,26 +135,13 @@ class OutstationController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $outstation = Outstation::where([
-            ['id', $request->outstation_id],
-            ['user_id', $request->user_id]
-        ])
-            ->with(['user'])
-            ->first();
-        $update = $outstation->update([
-            'is_approved' => $request->is_approved
-        ]);
-
-        $notification = $outstation->is_approved ?
-            new OutstationApprovedNotification($outstation) :
-            new OutstationRejectedNotification($outstation, $request->reason);
+        $update = $this->outstationRepository->approve($request);
 
         if ($update) {
-            $outstation->user->notify($notification);
             return setJson(
                 true,
                 'Sukses mengubah status dinas luar!',
-                fractal()->item($outstation)->transformWith(new EmployeeOutstationTransformer)->serializeWith(new CustomSerializer),
+                'Berhasil',
                 200,
                 []
             );

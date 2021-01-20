@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers\Api;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\AbsentPermission;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\AbsentPermissionTransformer;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Transformers\EmployeePermissionTransformer;
-use App\Notifications\AbsentPermissionCreatedNotification;
-use App\Notifications\AbsentPermissionApprovedNotification;
-use App\Notifications\AbsentPermissionRejectedNotification;
+use App\Repositories\Interfaces\AbsentPermissionRepositoryInterface;
 
 class AbsentPermissionController extends Controller
 {
+
+    private $absentPermissionRepository;
+
+
+    public function __construct(AbsentPermissionRepositoryInterface $absentPermissionRepository)
+    {
+        $this->absentPermissionRepository = $absentPermissionRepository;
+    }
     /**
      * Display a listing of the absent permissions.
      *
@@ -24,7 +27,7 @@ class AbsentPermissionController extends Controller
      */
     public function index(Request $request)
     {
-        $permissions = AbsentPermission::where('user_id', $request->user()->id)->latest()->get();
+        $permissions = $this->absentPermissionRepository->getByUser($request->user()->id);
         $permissions = fractal()
             ->collection($permissions, new AbsentPermissionTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -63,44 +66,23 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $permission = AbsentPermission::whereDate('start_date', Carbon::parse($request->start_date))
-            ->where('user_id', $request->user()->id)
+        $permission = $this->absentPermissionRepository->getByUserAndStartDate(
+            $request->user()->id,
+            $request->start_date
+        )
             ->first();
 
         if ($permission) {
             return setJson(false, 'Gagal', [], 400, ['tanggal_kadaluarsa' => ['Anda sudah mengajukan izin tertanggal ' . now()->translatedFormat('l, d F Y')]]);
         }
 
-        $permissions = AbsentPermission::whereYear('start_date', now()->year)
-            ->where([
-                ['user_id', request()->user()->id],
-                ['is_approved', true]
-            ])->get();
-
-
-        $realImage = base64_decode($request->photo);
-        $imageName = $request->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
-
-        Storage::disk('public')->put("izin/" . $request->user()->name . "/"   . $imageName,  $realImage);
-
-        $permission = AbsentPermission::create([
-            'user_id' => $request->user()->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'photo' => "izin/" . $request->user()->name . "/"   . $imageName,
-            'due_date' => Carbon::parse($request->due_date),
-            'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => true
-        ]);
+        $permission = $this->absentPermissionRepository->save($request);
 
         if ($permission) {
-            $request->user()->notify(new AbsentPermissionCreatedNotification($permission));
             return setJson(
                 true,
-                'Berhasil',
-                fractal()->item($permission)
-                    ->transformWith(new AbsentPermissionTransformer)
-                    ->serializeWith(new CustomSerializer)->toArray(),
+                'Berhasil mengajukan izin!',
+                'Berhasil!',
                 201,
                 []
             );
@@ -121,7 +103,7 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
-        $permissions = AbsentPermission::orderBy('created_at', 'desc')->get();
+        $permissions = $this->absentPermissionRepository->all();
         $permissions = fractal()->collection($permissions, new EmployeePermissionTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
 
@@ -146,7 +128,7 @@ class AbsentPermissionController extends Controller
             $request->all(),
             [
                 'user_id' => '',
-                'id' => '',
+                'permission_id' => '',
                 'is_approved' => 'required',
                 'reason' => 'required_if:is_approved,0'
             ],
@@ -159,26 +141,13 @@ class AbsentPermissionController extends Controller
             return setJson(false, 'Gagal', [], 400, $validator->errors());
         }
 
-        $permission = AbsentPermission::where([
-            ['id', $request->permission_id],
-            ['user_id', $request->user_id]
-        ])
-            ->with(['user'])
-            ->first();
-        $update = $permission->update([
-            'is_approved' => $request->is_approved
-        ]);
-
-        $notification = $permission->is_approved ?
-            new AbsentPermissionApprovedNotification($permission) :
-            new AbsentPermissionRejectedNotification($permission, $request->reason);
+        $update = $this->absentPermissionRepository->approve($request);
 
         if ($update) {
-            $permission->user->notify($notification);
             return setJson(
                 true,
                 'Sukses mengubah status izin!',
-                fractal()->item($permission)->transformWith(new EmployeePermissionTransformer)->serializeWith(new CustomSerializer),
+                'Berhasil',
                 200,
                 []
             );

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Transformers;
+namespace App\Transformers\Web;
 
 use App\Models\User;
 use League\Fractal\TransformerAbstract;
 
-class AllUserTransformers extends TransformerAbstract
+class AttendeUserTransformer extends TransformerAbstract
 {
     private $presence;
 
-    public function __construct($presence = null)
+    public function __construct($presence)
     {
         $this->presence = $presence;
     }
@@ -19,7 +19,7 @@ class AllUserTransformers extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        // 
+        //
     ];
 
     /**
@@ -39,16 +39,12 @@ class AllUserTransformers extends TransformerAbstract
     public function transform(User $user)
     {
         return [
-            'nip' => $user->nip ?? "",
             'name' => $user->name,
-            'rank' => optional($user->golongan)->rank,
-            'group' => optional($user->golongan)->group,
             'status' => $user->status,
+            'nip' => $user->nip,
             'department' => $user->departemen->name,
             'position' => $user->position,
-            'phone' => $user->phone ?? "",
-            'email' => $user->email ?? "",
-            'presence' => $this->presence
+            'presensi' => $this->presence
         ];
     }
 }
