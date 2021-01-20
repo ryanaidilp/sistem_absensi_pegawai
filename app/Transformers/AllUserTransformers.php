@@ -7,11 +7,11 @@ use League\Fractal\TransformerAbstract;
 
 class AllUserTransformers extends TransformerAbstract
 {
-    private $date;
+    private $presence;
 
-    public function __construct($date)
+    public function __construct($presence = null)
     {
-        $this->date = $date;
+        $this->presence = $presence;
     }
     /**
      * List of resources to automatically include
@@ -19,7 +19,7 @@ class AllUserTransformers extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        'presence',
+        // 
     ];
 
     /**
@@ -48,12 +48,7 @@ class AllUserTransformers extends TransformerAbstract
             'position' => $user->position,
             'phone' => $user->phone ?? "",
             'email' => $user->email ?? "",
+            'presence' => $this->presence
         ];
-    }
-
-    public function includePresence(User $user)
-    {
-        $date = $this->date;
-        return $this->collection($user->presensi()->whereDate('created_at', $date)->get(), new AttendeTransformers);
     }
 }
