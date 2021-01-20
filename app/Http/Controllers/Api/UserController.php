@@ -3,15 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Attende;
-use App\Models\Holiday;
 use App\Models\PaidLeave;
-use App\Models\Outstation;
 use App\Models\AttendeCode;
 use Illuminate\Http\Request;
 use App\Models\LeaveCategory;
-use App\Models\AbsentPermission;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use App\Transformers\UserTransformer;
@@ -19,9 +14,37 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Transformers\AllUserTransformers;
 use App\Transformers\Serializers\CustomSerializer;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\AttendeRepositoryInterface;
+use App\Repositories\Interfaces\HolidayRepositoryInterface;
+use App\Repositories\Interfaces\AbsentPermissionRepositoryInterface;
+use App\Repositories\Interfaces\OutstationRepositoryInterface;
+use App\Repositories\Interfaces\PaidLeaveRepositoryInterface;
 
 class UserController extends Controller
 {
+    private $userRepository;
+    private $attendeRepository;
+    private $holidayRepository;
+    private $paidLeaveRepository;
+    private $outstationRepository;
+    private $absentPermissionRepository;
+
+    public function __construct(
+        UserRepositoryInterface $userRepository,
+        AttendeRepositoryInterface $attendeRepository,
+        HolidayRepositoryInterface $holidayRepository,
+        PaidLeaveRepositoryInterface $paidLeaveRepository,
+        OutstationRepositoryInterface $outstationRepository,
+        AbsentPermissionRepositoryInterface $absentPermissionRepository
+    ) {
+        $this->userRepository = $userRepository;
+        $this->attendeRepository = $attendeRepository;
+        $this->holidayRepository = $holidayRepository;
+        $this->paidLeaveRepository = $paidLeaveRepository;
+        $this->outstationRepository = $outstationRepository;
+        $this->absentPermissionRepository = $absentPermissionRepository;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -30,17 +53,15 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::with(['gender', 'departemen', 'golongan'])
-            ->where('id', '!=', $request->user()->id)->where(function ($query) {
-                return $query->pns()
-                    ->orWhere
-                    ->honorer();
-            })
-            ->get();
-        $users = fractal()->collection($users)
-            ->transformWith(new AllUserTransformers(today()))
-            ->serializeWith(new CustomSerializer)
-            ->toArray();
+        $date = today();
+        $attendes = $this->attendeRepository->getByDate($date, $request->user()->id);
+        $users = $this->attendeRepository->formatUserAttendes($attendes);
+        if ($users->count() <= 0) {
+            $users = $this->userRepository->allExcept($request->user()->id);
+            $users = fractal()->collection($users)
+                ->transformWith(new AllUserTransformers)
+                ->serializeWith(new CustomSerializer)->toArray();
+        }
         return setJson(true, 'Berhasil mengambil seluruh data pegawai!', $users, 200, []);
     }
 
@@ -61,7 +82,7 @@ class UserController extends Controller
         }
 
 
-        $user = User::where('phone', wordwrap($request->phone, 4, " ", true))->with(['presensi', 'dinas_luar', 'izin', 'departemen', 'gender'])->first();
+        $user = $this->userRepository->getByPhone($request->phone);
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return setJson(false, 'Data tidak ditemukan!', [], 400, ['message' => ['No handphone/password salah']]);
@@ -218,44 +239,21 @@ class UserController extends Controller
     {
         $year = $request->has('year') ? $request->year : now()->year;
         $month = $request->has('month') ? $request->month : now()->month;
+        $userId = $request->has('user_id') ? $request->user_id : $request->user()->id;
 
         // Get holiday data
-        $holidays = Holiday::whereYear('date', $year)->get();
-        $holidays = $holidays->map(function ($holiday) {
-            return [
-                'date' => $holiday->date,
-                'name' => $holiday->name,
-                'description' => $holiday->description
-            ];
-        })->toArray();
+        $holidays = $this->holidayRepository->getByYear($year);
 
         // Get User's Absent Permission
-        $absent_permission = AbsentPermission::select(['id', 'user_id', 'start_date', 'due_date'])->where([
-            ['is_approved', 1],
-            ['user_id', $request->user()->id]
-        ])
-            ->whereYear('created_at', $year)
-            ->get();
+        $absent_permission = $this->absentPermissionRepository->getByUserAndYear($userId, $year);
         $total_permission_day = $this->checkDifference($absent_permission);
 
         // Get User's Outstation
-        $outstations = Outstation::select(['id', 'user_id', 'start_date', 'due_date'])
-            ->where([
-                ['is_approved', true],
-                ['user_id', $request->user()->id]
-            ])
-            ->whereYear('created_at', $year)
-            ->get();
+        $outstations = $this->outstationRepository->getByUserAndYear($userId, $year);
         $total_outstation_day = $this->checkDifference($outstations);
 
         // Get User's Paid Leave data
-        $paid_leave = PaidLeave::select(['id', 'leave_category_id', 'user_id', 'start_date', 'due_date'])->where([
-            ['is_approved', 1],
-            ['user_id', $request->user()->id]
-        ])
-            ->with(['kategori'])
-            ->whereYear('created_at', $year)
-            ->get();
+        $paid_leave = $this->paidLeaveRepository->getByUserAndYear($userId, $year);
 
         $annual_leave = $this->filterPaidLeave($paid_leave, PaidLeave::ANNUAL);
         $important_reason_leave = $this->filterPaidLeave($paid_leave, PaidLeave::IMPORTANT_REASON);
@@ -277,13 +275,7 @@ class UserController extends Controller
         $total_out_of_liability_leave = $this->checkDifference($out_of_liability_leave);
 
         // Get User's Attendance Data
-        $dates = Attende::where([
-            ['user_id', $request->user()->id]
-        ])
-            ->with(['status_kehadiran', 'kode_absen.tipe'])
-            ->whereYear('created_at', $year)
-            ->orderBy('attende_code_id')
-            ->get();
+        $dates = $this->attendeRepository->getByUserAndYear($userId, $year);
 
         // Map user attendance data to daily attendance
         $daily = $dates->groupBy(function ($item) {
@@ -316,13 +308,9 @@ class UserController extends Controller
                     ];
                 })
             ];
-        })->toArray();
+        });
 
-        $daily_formated = [];
-        foreach ($daily as $value) {
-            array_push($daily_formated, $value);
-        }
-        $daily_formated = collect($daily_formated);
+        $daily_formated = $daily->values();
 
         $yearly_absent_count = $daily_formated->filter(function ($item) {
             return $item['attendance_percentage'] == 0;
@@ -479,7 +467,7 @@ class UserController extends Controller
     {
         $attendeCode = AttendeCode::with(['tipe'])->whereDate('created_at', today())->get();
         $weekend = today()->isWeekend();
-        $holiday = Holiday::whereDate('date', today())->first();
+        $holiday = $this->holidayRepository->getToday();
 
         $nextPresence = null;
 
@@ -493,13 +481,13 @@ class UserController extends Controller
             $nextPresence = null;
         } else if (!$weekend && $attendeCode->count() > 0) {
             if (now()->hour >= 8 && now()->hour < 12) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[1]->id]])->first();
+                $nextPresence = $this->attendeRepository->getByUserAndCode($userId, $attendeCode[1]->id);
             } else if (now()->hour >= 12 && now()->hour < 13) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[2]->id]])->first();
+                $nextPresence = $this->attendeRepository->getByUserAndCode($userId, $attendeCode[2]->id);
             } else if (now()->hour >= 13 && now()->hour < 18) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[3]->id]])->first();
+                $nextPresence = $this->attendeRepository->getByUserAndCode($userId, $attendeCode[3]->id);
             } else if (now()->hour >= 0 && now()->hour < 8) {
-                $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $attendeCode[0]->id]])->first();
+                $nextPresence = $this->attendeRepository->getByUserAndCode($userId, $attendeCode[0]->id);
             }
         }
 
@@ -510,7 +498,7 @@ class UserController extends Controller
                 &&
                 Carbon::parse($code->end_time) >= now()
             ) {
-                $nextPresence = $nextPresence = Attende::where([['user_id', $userId], ['attende_code_id', $code->id]])->first();;
+                $nextPresence = $this->attendeRepository->getByUserAndCode($userId, $code->id);
                 break;
             }
         }
