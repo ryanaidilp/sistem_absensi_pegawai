@@ -2,29 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use DateInterval;
 use Carbon\Carbon;
 use Inertia\Inertia;
-use App\Models\User;
-use App\Models\Holiday;
-use App\Models\Attende;
-use App\Models\PaidLeave;
-use App\Models\Outstation;
-use App\Models\AttendeCode;
 use Illuminate\Http\Request;
-use App\Models\AbsentPermission;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Transformers\Web\AttendeCodeTransformer;
+use App\Transformers\Serializers\CustomSerializer;
+use App\Repositories\Interfaces\AttendeRepositoryInterface;
+use App\Repositories\Interfaces\HolidayRepositoryInterface;
+use App\Repositories\Interfaces\PaidLeaveRepositoryInterface;
+use App\Repositories\Interfaces\OutstationRepositoryInterface;
+use App\Repositories\Interfaces\AttendeCodeRepositoryInterface;
+use App\Repositories\Interfaces\AbsentPermissionRepositoryInterface;
 
 class MainController extends Controller
 {
+
+    private $holidayRepository;
+    private $attendeRepository;
+    private $paidLeaveRepository;
+    private $outstationRepository;
+    private $attendeCodeRepository;
+    private $absentPermissionRepository;
+
+    public function __construct(
+        HolidayRepositoryInterface $holidayRepository,
+        AttendeRepositoryInterface $attendeRepository,
+        PaidLeaveRepositoryInterface $paidLeaveRepository,
+        OutstationRepositoryInterface $outstationRepository,
+        AttendeCodeRepositoryInterface $attendeCodeRepository,
+        AbsentPermissionRepositoryInterface $absentPermissionRepository
+    ) {
+        $this->holidayRepository = $holidayRepository;
+        $this->attendeRepository = $attendeRepository;
+        $this->paidLeaveRepository = $paidLeaveRepository;
+        $this->outstationRepository = $outstationRepository;
+        $this->attendeCodeRepository = $attendeCodeRepository;
+        $this->absentPermissionRepository = $absentPermissionRepository;
+    }
+
     public function index()
     {
-        $attendeCode = AttendeCode::with(['tipe'])->whereDate('created_at', today())->get();
+        $attendeCode = $this->attendeCodeRepository->getToday();
         $absent = null;
         $weekend = today()->isWeekend();
-        $holiday = Holiday::whereDate('date', today())->first();
+        $holiday = $this->holidayRepository->getToday();
 
         $holiday = (object) [
             'is_holiday' => !is_null($holiday),
@@ -53,18 +75,12 @@ class MainController extends Controller
                 Carbon::parse($code->end_time) >= now()
             ) {
                 $deadline = Carbon::parse($code->end_time);
-                $absent = [
-                    'code' => "data:image/svg+xml;base64," . base64_encode(QrCode::size(200)->style('round')->generate($code->code)),
-                    'start_time' => Carbon::parse($code->start_time)->format('H:i'),
-                    'end_time' => Carbon::parse($code->end_time)->format('H:i'),
-                    'type' => $code->tipe->name,
-                    'date' => Carbon::parse($code->end_time)->translatedFormat('l, d F Y')
-                ];
+                $absent = fractal()->item($code)
+                    ->transformWith(new AttendeCodeTransformer)
+                    ->serializeWith(new CustomSerializer)->toArray();
                 break;
             }
         }
-
-
 
         return Inertia::render('Home/Index', [
             'code' => $absent,
@@ -77,43 +93,19 @@ class MainController extends Controller
     public function export(Request $request)
     {
         $date = $request->has('date') ? Carbon::parse($request->date) : today();
-        $attendes = Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'pegawai.departemen'])->whereDate('created_at', $date)->get();
-        $attendes = $attendes->groupBy('user_id');
-        $attendes = $attendes->map(function ($attende) use ($date) {
-            $user = $attende->first()->pegawai;
-            $presence = $attende->map(function ($data) use ($date) {
-                $status = $data->status_kehadiran->name;
-                if ($status === 'Terlambat') {
-                    $status = $data->status_kehadiran->name;
-                    $status .= calculateLateTime($data->kode_absen->start_time, $data->attend_time, $date);
-                }
-                return [
-                    'status' => $status,
-                    'attend_time' => $data->attend_time == null ? "-" : Carbon::parse($data->attend_time)->format('H:i')
-                ];
-            });
-            return [
-                'name' => $user->name,
-                'status' => $user->status,
-                'nip' => $user->nip,
-                'department' => $user->departemen->name,
-                'position' => $user->position,
-                'presensi' => $presence
-            ];
-        });
-        $attendes = $attendes->values();
+        $attendes = $this->attendeRepository->getByDate($date);
+        $attendes = $this->attendeRepository->formatUserAttendes($attendes, true);
+
         $pns = $attendes->filter(function ($user) {
             return $user['status'] === 'PNS';
         });
         $honorer = $attendes->filter(function ($user) {
             return $user['status'] === 'Honorer';
         });
-        $izin = AbsentPermission::with(['user'])->whereDate('start_date', '<=', $date)
-            ->whereDate('due_date', '>=', $date)->get();
-        $cuti = PaidLeave::with(['user'])->whereDate('start_date', '<=', $date)
-            ->whereDate('due_date', '>=', $date)->get();
-        $dinas = Outstation::with(['user'])->whereDate('start_date', '<=', $date)
-            ->whereDate('due_date', '>=', $date)->get();
+
+        $izin = $this->absentPermissionRepository->getBetweenDate($date);
+        $cuti = $this->paidLeaveRepository->getBetweenDate($date);
+        $dinas = $this->outstationRepository->getBetweenDate($date);
 
         $leaves = array();
 
