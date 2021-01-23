@@ -48,7 +48,7 @@ class AllUserTransformers extends TransformerAbstract
             'position' => $user->position,
             'phone' => $user->phone ?? "",
             'email' => $user->email ?? "",
-            'presence' => $this->presence
+            'presence' => $this->presence ?? []
         ];
     }
 }
