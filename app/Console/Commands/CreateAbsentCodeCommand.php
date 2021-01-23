@@ -48,8 +48,6 @@ class CreateAbsentCodeCommand extends Command
 
         $types = AttendeType::all();
 
-        $types = AttendeType::all();
-
         $holiday = $this->holidayRepository->getToday();
 
         if (!$holiday) {
@@ -72,7 +70,7 @@ class CreateAbsentCodeCommand extends Command
                 ][$type->name];
                 $type->kode_absen()->create(
                     [
-                        'code' => Str::random(8),
+                        'code' => $code,
                         'start_time' => $start_time,
                         'end_time' => $end_time,
 
