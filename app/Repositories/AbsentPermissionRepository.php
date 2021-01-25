@@ -41,7 +41,8 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
             'photo' => "izin/" . $folder . "/"   . $imageName,
             'due_date' => Carbon::parse($request->due_date),
             'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => true
+            'is_approved' => false,
+            'approval_status_id' => AbsentPermission::PENDING
         ]);
 
         if ($permission) {
@@ -59,8 +60,12 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
         ])
             ->with(['user'])
             ->first();
+
+        $status = $request->is_approved ? AbsentPermission::APPROVED : AbsentPermission::REJECTED;
+
         $update = $permission->update([
-            'is_approved' => $request->is_approved
+            'is_approved' => $request->is_approved,
+            'approval_status_id' => $status
         ]);
 
         $notification = $permission->is_approved ?
