@@ -58,7 +58,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [OutstationController::class, 'index']);
         Route::get('/all', [OutstationController::class, 'all']);
         Route::post('/approve', [OutstationController::class, 'approve']);
-        Route::post('/picture',  [OutstationController::class, 'picture']);
+        Route::post('/picture',  [OutstationController::class, 'updatePicture']);
     });
 
     Route::group(['prefix' => 'paid-leave'], function () {
@@ -66,6 +66,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [PaidLeaveController::class, 'index']);
         Route::get('/all', [PaidLeaveController::class, 'all']);
         Route::post('/approve', [PaidLeaveController::class, 'approve']);
-        Route::post('/picture',  [PaidLeaveController::class, 'picture']);
+        Route::post('/picture',  [PaidLeaveController::class, 'updatePicture']);
     });
 });
