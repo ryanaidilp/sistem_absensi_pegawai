@@ -10,6 +10,7 @@ interface OutstationRepositoryInterface
     public function save(Request $request, $name = null, $id = null);
     public function approve(Request $request);
     public function getByUser($userId);
+    public function updatePicture(Request $request);
     public function getBetweenDate($date);
     public function getByUserAndYear($userId, $year);
     public function getByUserAndStartDate($userId, $startDate);

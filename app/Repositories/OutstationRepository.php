@@ -72,6 +72,31 @@ class OutstationRepository implements OutstationRepositoryInterface
         return $update;
     }
 
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $outstation = Outstation::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->outstation_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $outstation->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "dinas_luar/" . $folder . "/"   . $imageName;
+
+
+        if (Storage::exists($outstation->photo)) {
+            Storage::delete([$outstation->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $outstation->update([
+            'photo' => $path
+        ]);
+    }
+
     public function getByUser($userId)
     {
         return Outstation::where('user_id', $userId)->latest()->get();
