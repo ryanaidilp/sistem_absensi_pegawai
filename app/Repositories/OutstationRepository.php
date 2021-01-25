@@ -34,7 +34,8 @@ class OutstationRepository implements OutstationRepositoryInterface
             'photo' => "dinas_luar/" . $folder . "/"   . $imageName,
             'due_date' => Carbon::parse($request->due_date),
             'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => true
+            'is_approved' => false,
+            'approval_status_id' => Outstation::PENDING
         ]);
 
         if ($outstation && is_null($id)) {
@@ -53,8 +54,11 @@ class OutstationRepository implements OutstationRepositoryInterface
             ->with(['user'])
             ->first();
 
+        $status = $request->is_approved ? Outstation::APPROVED : Outstation::REJECTED;
+
         $update = $outstation->update([
-            'is_approved' => $request->is_approved
+            'is_approved' => $request->is_approved,
+            'approval_status_id' => $status
         ]);
 
         $notification = $outstation->is_approved ?
@@ -66,6 +70,31 @@ class OutstationRepository implements OutstationRepositoryInterface
         }
 
         return $update;
+    }
+
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $outstation = Outstation::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->outstation_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $outstation->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "dinas_luar/" . $folder . "/"   . $imageName;
+
+
+        if (Storage::exists($outstation->photo)) {
+            Storage::delete([$outstation->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $outstation->update([
+            'photo' => $path
+        ]);
     }
 
     public function getByUser($userId)

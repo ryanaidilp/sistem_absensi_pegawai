@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [AbsentPermissionController::class, 'index']);
         Route::get('/all', [AbsentPermissionController::class, 'all']);
         Route::post('/approve',  [AbsentPermissionController::class, 'approve']);
+        Route::post('/picture',  [AbsentPermissionController::class, 'updatePicture']);
     });
 
 
@@ -57,6 +58,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [OutstationController::class, 'index']);
         Route::get('/all', [OutstationController::class, 'all']);
         Route::post('/approve', [OutstationController::class, 'approve']);
+        Route::post('/picture',  [OutstationController::class, 'updatePicture']);
     });
 
     Route::group(['prefix' => 'paid-leave'], function () {
@@ -64,5 +66,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/', [PaidLeaveController::class, 'index']);
         Route::get('/all', [PaidLeaveController::class, 'all']);
         Route::post('/approve', [PaidLeaveController::class, 'approve']);
+        Route::post('/picture',  [PaidLeaveController::class, 'updatePicture']);
     });
 });

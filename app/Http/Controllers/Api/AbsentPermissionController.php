@@ -154,4 +154,40 @@ class AbsentPermissionController extends Controller
         }
         return setJson(false, 'Gagal', [], 400, ['message' => ['Kesalahan tidak diketahui!']]);
     }
+
+    /**
+     * Approve the specified absent permission in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\AbsentPermission  $absentPermission
+     * @return \Illuminate\Http\Response
+     */
+    public function updatePicture(Request $request)
+    {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'permission_id' => '',
+                'photo' => 'required',
+                'file_name' => 'required'
+            ],
+        );
+
+        if ($validator->fails()) {
+            return setJson(false, 'Gagal', [], 400, $validator->errors());
+        }
+
+        $update = $this->absentPermissionRepository->updatePicture($request);
+
+        if ($update) {
+            return setJson(
+                true,
+                'Sukses mengubah gambar izin!',
+                'Berhasil',
+                200,
+                []
+            );
+        }
+        return setJson(false, 'Gagal', [], 400, ['message' => ['Kesalahan tidak diketahui!']]);
+    }
 }

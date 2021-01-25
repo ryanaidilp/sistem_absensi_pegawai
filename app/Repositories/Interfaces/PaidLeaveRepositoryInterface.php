@@ -10,6 +10,7 @@ interface PaidLeaveRepositoryInterface
     public function save(Request $request, $categoryName);
     public function approve(Request $request);
     public function getByUser($userId);
+    public function updatePicture(Request $request);
     public function getBetweenDate($date);
     public function getByUserAndYear($userId, $year);
     public function getByUserAndCategory($userId, $categoryId);

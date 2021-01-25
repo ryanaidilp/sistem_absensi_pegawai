@@ -33,7 +33,8 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
             'photo' => $path,
             'start_date' => Carbon::parse($request->start_date),
             'due_date' => Carbon::parse($request->due_date),
-            'is_approved' => true
+            'is_approved' => false,
+            'approval_status_id' => PaidLeave::PENDING
         ]);
 
         if ($paid_leave) {
@@ -50,8 +51,11 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
             ['user_id', $request->user_id],
         ])->with('user')->first();
 
+        $status = $request->is_approved ? PaidLeave::APPROVED : PaidLeave::REJECTED;
+
         $update = $paidLeave->update([
-            'is_approved' => $request->is_approved
+            'is_approved' => $request->is_approved,
+            'approval_status_id' => $status
         ]);
 
         $notification = $paidLeave->is_approved ?
@@ -61,6 +65,31 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
             $paidLeave->user->notify($notification);
         }
         return $update;
+    }
+
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $paid_leave = PaidLeave::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->paid_leave_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $paid_leave->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "cuti/" . $folder . "/" . $paid_leave->kategori->name . "/" . $imageName;
+
+
+        if (Storage::exists($paid_leave->photo)) {
+            Storage::delete([$paid_leave->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $paid_leave->update([
+            'photo' => $path
+        ]);
     }
 
     public function getByUser($userId)
@@ -77,7 +106,7 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
     public function getByUserAndYear($userId, $year)
     {
         return PaidLeave::select(['id', 'leave_category_id', 'user_id', 'start_date', 'due_date'])->where([
-            ['is_approved', 1],
+            ['is_approved', true],
             ['user_id', $userId]
         ])
             ->with(['kategori'])

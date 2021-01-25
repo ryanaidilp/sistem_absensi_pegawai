@@ -41,7 +41,8 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
             'photo' => "izin/" . $folder . "/"   . $imageName,
             'due_date' => Carbon::parse($request->due_date),
             'start_date' => Carbon::parse($request->start_date),
-            'is_approved' => true
+            'is_approved' => false,
+            'approval_status_id' => AbsentPermission::PENDING
         ]);
 
         if ($permission) {
@@ -59,8 +60,12 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
         ])
             ->with(['user'])
             ->first();
+
+        $status = $request->is_approved ? AbsentPermission::APPROVED : AbsentPermission::REJECTED;
+
         $update = $permission->update([
-            'is_approved' => $request->is_approved
+            'is_approved' => $request->is_approved,
+            'approval_status_id' => $status
         ]);
 
         $notification = $permission->is_approved ?
@@ -71,6 +76,31 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
             $permission->user->notify($notification);
         }
         return $update;
+    }
+
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $permission = AbsentPermission::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->permission_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $permission->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "izin/" . $folder . "/"   . $imageName;
+
+
+        if (Storage::exists($permission->photo)) {
+            Storage::delete([$permission->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $permission->update([
+            'photo' => $path
+        ]);
     }
 
     public function getByUser($userId)

@@ -2,12 +2,11 @@
 
 namespace App\Notifications;
 
-use App\Models\AbsentPermission;
-use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Bus\Queueable;
+use App\Models\AbsentPermission;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class AbsentPermissionRejectedNotification extends Notification
@@ -42,7 +41,7 @@ class AbsentPermissionRejectedNotification extends Notification
     public function toDatabase($notifiable)
     {
         $izin = $this->permission;
-        $body = "$izin->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : {$this->reason}";
+        $body = "$izin->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan :\n{$this->reason}";
         return [
             'heading' => "Izin ditolak!",
             'body' => $body,
@@ -52,7 +51,7 @@ class AbsentPermissionRejectedNotification extends Notification
     public function toOneSignal($notifiable)
     {
         $izin = $this->permission;
-        $body = "$izin->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : {$this->reason}";
+        $body = "$izin->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan :\n{$this->reason}";
         return [
             'heading' => "Izin ditolak!",
             'body' => $body,

@@ -3,10 +3,10 @@
 namespace App\Notifications;
 
 use App\Models\Outstation;
-use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class OutstationExpiredNotification extends Notification

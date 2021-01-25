@@ -2,10 +2,8 @@
 
 namespace App\Observers;
 
-use Carbon\Carbon;
 use App\Models\Attende;
 use App\Models\AbsentPermission;
-use Illuminate\Support\Facades\Log;
 
 class AbsentPermissionObserver
 {
@@ -17,7 +15,7 @@ class AbsentPermissionObserver
      */
     public function created(AbsentPermission $absentPermission)
     {
-        $this->updateStatus(Attende::ABSENT, Attende::PERMISSION, $absentPermission);
+        // 
     }
 
     /**
@@ -29,34 +27,12 @@ class AbsentPermissionObserver
     public function updated(AbsentPermission $absentPermission)
     {
         if ($absentPermission->is_approved) {
-            $this->updateStatus(Attende::ABSENT, Attende::PERMISSION, $absentPermission);
+            updateStatus(Attende::ABSENT, Attende::PERMISSION, $absentPermission);
         } else {
-            $this->updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
+            updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
         }
     }
 
-    private function updateStatus($from, $to, AbsentPermission $absentPermission)
-    {
-
-        if (
-            Carbon::parse($absentPermission->due_date)->isBefore(today()) ||
-            Carbon::parse($absentPermission->start_date)->isBefore(today())
-        ) {
-            $presences = $absentPermission->user->presensi()
-                ->whereDate('created_at', '>=', Carbon::parse($absentPermission->start_date)->toDateString())
-                ->whereDate('created_at', '<=',  Carbon::parse($absentPermission->due_date)->toDateString())
-                ->where('attende_status_id', $from)->get();
-        } else if (Carbon::parse($absentPermission->start_date)->isToday()) {
-            $presences = $absentPermission->user->presensi()->today()->where('attende_status_id', $from)->get();
-        } else {
-            return;
-        }
-        foreach ($presences as $presence) {
-            $presence->update([
-                'attende_status_id' => $to
-            ]);
-        }
-    }
 
     /**
      * Handle the AbsentPermission "deleted" event.
@@ -67,7 +43,7 @@ class AbsentPermissionObserver
     public function deleted(AbsentPermission $absentPermission)
     {
         if ($absentPermission->is_approved) {
-            $this->updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
+            updateStatus(Attende::PERMISSION, Attende::ABSENT, $absentPermission);
         }
     }
 

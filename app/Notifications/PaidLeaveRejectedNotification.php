@@ -43,7 +43,7 @@ class PaidLeaveRejectedNotification extends Notification
         $reason = $this->reason;
         return [
             'heading' => $cuti->kategori->name . " ditolak!",
-            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan : $reason",
+            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan :\n$reason",
         ];
     }
 
@@ -53,7 +53,7 @@ class PaidLeaveRejectedNotification extends Notification
         $reason = $this->reason;
         return [
             'heading' => $cuti->kategori->name . " ditolak!",
-            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan : $reason",
+            'body' => $cuti->kategori->name . " anda dengan subjek :\n$cuti->title\n\nTelah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan Penolakan :\n$reason",
             'user_id' => $notifiable->id
         ];
     }

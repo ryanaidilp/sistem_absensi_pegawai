@@ -38,6 +38,7 @@ class EmployeePermissionTransformer extends TransformerAbstract
             'title' => $permission->title,
             'description' => $permission->description,
             'is_approved' => $permission->is_approved ? true : false,
+            'approval_status' => $permission->status->name,
             'start_date' => $permission->start_date,
             'due_date' => $permission->due_date,
             'photo' => env('MEDIA_URL') . Storage::url($permission->photo),

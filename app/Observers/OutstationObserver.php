@@ -4,7 +4,6 @@ namespace App\Observers;
 
 use App\Models\Attende;
 use App\Models\Outstation;
-use Carbon\Carbon;
 
 class OutstationObserver
 {
@@ -16,7 +15,7 @@ class OutstationObserver
      */
     public function created(Outstation $outstation)
     {
-        $this->updateStatus(Attende::ABSENT, Attende::OUTSTATION, $outstation);
+        // 
     }
 
     /**
@@ -28,33 +27,12 @@ class OutstationObserver
     public function updated(Outstation $outstation)
     {
         if ($outstation->is_approved) {
-            $this->updateStatus(Attende::ABSENT, Attende::OUTSTATION, $outstation);
+            updateStatus(Attende::ABSENT, Attende::OUTSTATION, $outstation);
         } else {
-            $this->updateStatus(Attende::OUTSTATION, Attende::ABSENT, $outstation);
+            updateStatus(Attende::OUTSTATION, Attende::ABSENT, $outstation);
         }
     }
 
-    private function updateStatus($from, $to, $outstation)
-    {
-
-
-        if (Carbon::parse($outstation->due_date)->isBefore(today()) || Carbon::parse($outstation->start_date)->isBefore(today())) {
-            $presences = $outstation->user->presensi()
-                ->whereDate('created_at', '>=', Carbon::parse($outstation->start_date))
-                ->whereDate('created_at', '<=', Carbon::parse($outstation->due_date))
-                ->where('attende_status_id', $from)->get();
-        } else if (Carbon::parse($outstation->start_date)->isToday()) {
-            $presences = $outstation->user->presensi()->today()->where('attende_status_id', $from)->get();
-        } else {
-            return;
-        }
-
-        foreach ($presences as $presence) {
-            $presence->update([
-                'attende_status_id' => $to
-            ]);
-        }
-    }
 
     /**
      * Handle the Outstation "deleted" event.
@@ -65,7 +43,7 @@ class OutstationObserver
     public function deleted(Outstation $outstation)
     {
         if ($outstation->is_approved) {
-            $this->updateStatus(Attende::OUTSTATION, Attende::ABSENT, $outstation);
+            updateStatus(Attende::OUTSTATION, Attende::ABSENT, $outstation);
         }
     }
 }

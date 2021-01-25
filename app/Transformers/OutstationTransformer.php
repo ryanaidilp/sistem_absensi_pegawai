@@ -34,9 +34,11 @@ class OutstationTransformer extends TransformerAbstract
     public function transform(Outstation $outstation)
     {
         return [
+            'id' => $outstation->id,
             'title' => $outstation->title,
             'description' => $outstation->description,
             'is_approved' => $outstation->is_approved ? true : false,
+            'approval_status' => $outstation->status->name,
             'start_date' => $outstation->start_date,
             'due_date' => $outstation->due_date,
             'photo' => env('MEDIA_URL') . Storage::url($outstation->photo),
