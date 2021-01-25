@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Attende;
 use Carbon\Carbon;
+use App\Models\Attende;
 use Illuminate\Support\Facades\Http;
 
 function setJson($success, $message, $data, $statusCode, $errors = [])
@@ -103,4 +103,27 @@ function calculateLateTime($start_time, $attend_time, $date)
     }
 
     return " $duration menit";
+}
+
+
+function updateStatus($from, $to, $data)
+{
+
+
+    if (Carbon::parse($data->due_date)->isBefore(today()) || Carbon::parse($data->start_date)->isBefore(today())) {
+        $presences = $data->user->presensi()
+            ->whereDate('created_at', '>=', Carbon::parse($data->start_date))
+            ->whereDate('created_at', '<=', Carbon::parse($data->due_date))
+            ->where('attende_status_id', $from)->get();
+    } else if (Carbon::parse($data->start_date)->isToday()) {
+        $presences = $data->user->presensi()->today()->where('attende_status_id', $from)->get();
+    } else {
+        return;
+    }
+
+    foreach ($presences as $presence) {
+        $presence->update([
+            'attende_status_id' => $to
+        ]);
+    }
 }
