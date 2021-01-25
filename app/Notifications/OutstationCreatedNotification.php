@@ -2,13 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Models\Outstation;
-use App\Notifications\Channels\OneSignalChannel;
 use Carbon\Carbon;
+use App\Models\Outstation;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class OutstationCreatedNotification extends Notification
 {
@@ -44,7 +44,7 @@ class OutstationCreatedNotification extends Notification
         $due_date = Carbon::parse($outstation->due_date)->translatedFormat('l, d F Y');
         return [
             'heading' => "Dinas Luar diajukan!",
-            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nDinas Luar diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka Dinas Luar akan dibatalkan.",
+            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nDinas Luar diterima dan menunggu persetujuan.",
         ];
     }
 
@@ -56,7 +56,7 @@ class OutstationCreatedNotification extends Notification
         sendNotification("Dinas Luar baru diajukan oleh  {$notifiable->name} :\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date", 'Pengajuan Dinas Luar!', 2);
         return [
             'heading' => "Dinas Luar diajukan!",
-            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nDinas Luar diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka Dinas Luar akan dibatalkan.",
+            'body' => "Dinas Luar baru diajukan:\nJudul : $outstation->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nDinas Luar diterima dan menunggu persetujuan.",
             'user_id' => $notifiable->id
         ];
     }

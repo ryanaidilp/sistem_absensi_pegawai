@@ -2,12 +2,12 @@
 
 namespace App\Notifications;
 
-use App\Models\AbsentPermission;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use App\Models\AbsentPermission;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Notifications\Channels\OneSignalChannel;
-use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class AbsentPermissionCreatedNotification extends Notification
@@ -44,7 +44,7 @@ class AbsentPermissionCreatedNotification extends Notification
         $due_date = Carbon::parse($izin->due_date)->translatedFormat('l, d F Y');
         return [
             'heading' => "Izin diajukan!",
-            'body' => "Izin baru diajukan:\nJudul : $izin->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nIzin diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka izin akan dibatalkan.",
+            'body' => "Izin baru diajukan:\nJudul : $izin->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nIzin diterima dan menunggu persetujuan",
         ];
     }
 
@@ -54,7 +54,7 @@ class AbsentPermissionCreatedNotification extends Notification
         $start_date = Carbon::parse($izin->start_date)->translatedFormat('l, d F Y');
         $due_date = Carbon::parse($izin->due_date)->translatedFormat('l, d F Y');
         $headings = "Izin diajukan!";
-        $body = "Izin baru diajukan:\nJudul : $izin->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nIzin diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka izin akan dibatalkan.";
+        $body = "Izin baru diajukan:\nJudul : $izin->title\nMulai : $start_date\nSampai : $due_date\nStatus :\nIzin diterima dan menunggu persetujuan";
         sendNotification("Izin baru diajukan oleh  {$notifiable->name} :\nJudul : $izin->title\nMulai : $start_date\nSampai : $due_date", 'Pengajuan izin!', 2);
 
         return [

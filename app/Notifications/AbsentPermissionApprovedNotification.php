@@ -7,7 +7,6 @@ use App\Models\AbsentPermission;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Notifications\Channels\OneSignalChannel;
-use Carbon\Carbon;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class AbsentPermissionApprovedNotification extends Notification

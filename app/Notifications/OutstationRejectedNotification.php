@@ -3,11 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\Outstation;
-use App\Notifications\Channels\OneSignalChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class OutstationRejectedNotification extends Notification
 {
@@ -42,7 +42,7 @@ class OutstationRejectedNotification extends Notification
     {
         $outstation = $this->outstation;
         $reason = $this->reason;
-        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : $reason";
+        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan:\n$reason";
         return [
             'heading' => "Dinas Luar ditolak!",
             'body' => $body
@@ -53,7 +53,7 @@ class OutstationRejectedNotification extends Notification
     {
         $outstation = $this->outstation;
         $reason = $this->reason;
-        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan : $reason";
+        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan :\n$reason";
         return [
             'heading' => "Dinas Luar ditolak!",
             'body' => $body,

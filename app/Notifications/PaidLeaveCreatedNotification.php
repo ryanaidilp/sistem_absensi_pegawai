@@ -2,13 +2,13 @@
 
 namespace App\Notifications;
 
-use App\Models\PaidLeave;
-use App\Notifications\Channels\OneSignalChannel;
 use Carbon\Carbon;
+use App\Models\PaidLeave;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Notifications\Channels\OneSignalChannel;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class PaidLeaveCreatedNotification extends Notification
 {
@@ -44,7 +44,7 @@ class PaidLeaveCreatedNotification extends Notification
         $due_date = Carbon::parse($cuti->due_date)->translatedFormat('l, d F Y');
         return [
             'heading' => $cuti->kategori->name . ' diajukan!',
-            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\n{$cuti->kategori->name} diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka {$cuti->kategori->name} akan dibatalkan."
+            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\n{$cuti->kategori->name} diterima dan menunggu persetujuan."
         ];
     }
 
@@ -57,7 +57,7 @@ class PaidLeaveCreatedNotification extends Notification
         return [
             'user_id' => $notifiable->id,
             'heading' => $cuti->kategori->name . ' diajukan!',
-            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\n{$cuti->kategori->name} diterima dan akan ditinjau kembali. Jika tidak sesuai ketentuan, maka {$cuti->kategori->name} akan dibatalkan."
+            'body' => "Cuti baru diajukan:\nJenis Cuti : {$cuti->kategori->name}\nJudul : $cuti->title\nMulai : $start_date\nSampai : $due_date\nStatus :\n{$cuti->kategori->name} diterima dan menunggu persetujuan."
         ];
     }
 }

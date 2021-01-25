@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Models\AbsentPermission;
 use Illuminate\Bus\Queueable;
+use App\Models\AbsentPermission;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Notifications\Channels\OneSignalChannel;
