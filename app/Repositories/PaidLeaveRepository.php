@@ -67,6 +67,31 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
         return $update;
     }
 
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $paid_leave = PaidLeave::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->paid_leave_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $paid_leave->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "cuti/" . $folder . "/" . $paid_leave->kategori->name . "/" . $imageName;
+
+
+        if (Storage::exists($paid_leave->photo)) {
+            Storage::delete([$paid_leave->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $paid_leave->update([
+            'photo' => $path
+        ]);
+    }
+
     public function getByUser($userId)
     {
         return PaidLeave::where('user_id', $userId)->latest()->get();
