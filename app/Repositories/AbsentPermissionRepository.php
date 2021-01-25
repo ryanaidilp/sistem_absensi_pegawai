@@ -78,6 +78,31 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
         return $update;
     }
 
+    public function updatePicture(Request $request)
+    {
+        $folder = $request->user()->name;
+
+        $permission = AbsentPermission::where([
+            ['user_id', $request->user()->id],
+            ['id', $request->permission_id]
+        ])->first();
+
+        $realImage = base64_decode($request->photo);
+        $imageName = $permission->title . "-" . now()->translatedFormat('l, d F Y') . "-" . $request->file_name;
+        $path = "izin/" . $folder . "/"   . $imageName;
+
+
+        if (Storage::exists($permission->photo)) {
+            Storage::delete([$permission->photo]);
+        }
+
+        Storage::disk('public')->put($path,  $realImage);
+
+        return $permission->update([
+            'photo' => $path
+        ]);
+    }
+
     public function getByUser($userId)
     {
         return AbsentPermission::where('user_id', $userId)->latest()->get();
