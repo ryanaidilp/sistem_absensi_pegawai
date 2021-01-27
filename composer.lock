@@ -2223,16 +2223,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v8.23.1",
+            "version": "v8.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "a813df1b248ca305e5f5ce23ea981ed6c6905504"
+                "reference": "05da44d6823c2923597519ac10151f5827a24f80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/a813df1b248ca305e5f5ce23ea981ed6c6905504",
-                "reference": "a813df1b248ca305e5f5ce23ea981ed6c6905504",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/05da44d6823c2923597519ac10151f5827a24f80",
+                "reference": "05da44d6823c2923597519ac10151f5827a24f80",
                 "shasum": ""
             },
             "require": {
@@ -2319,6 +2319,7 @@
             },
             "suggest": {
                 "aws/aws-sdk-php": "Required to use the SQS queue driver, DynamoDb failed job storage and SES mail driver (^3.155).",
+                "brianium/paratest": "Required to run tests in parallel (^6.0).",
                 "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6|^3.0).",
                 "ext-ftp": "Required to use the Flysystem FTP driver.",
                 "ext-gd": "Required to use Illuminate\\Http\\Testing\\FileFactory::image().",
@@ -2386,20 +2387,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2021-01-19T14:10:48+00:00"
+            "time": "2021-01-26T14:40:21+00:00"
         },
         {
             "name": "laravel/sanctum",
-            "version": "v2.8.2",
+            "version": "v2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/sanctum.git",
-                "reference": "331bd6572610b06ad6dd6b2a7c15a0465a3ca9c9"
+                "reference": "eb191ddfc3ec04bbead33593bf982e871095f25c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/sanctum/zipball/331bd6572610b06ad6dd6b2a7c15a0465a3ca9c9",
-                "reference": "331bd6572610b06ad6dd6b2a7c15a0465a3ca9c9",
+                "url": "https://api.github.com/repos/laravel/sanctum/zipball/eb191ddfc3ec04bbead33593bf982e871095f25c",
+                "reference": "eb191ddfc3ec04bbead33593bf982e871095f25c",
                 "shasum": ""
             },
             "require": {
@@ -2450,20 +2451,20 @@
                 "issues": "https://github.com/laravel/sanctum/issues",
                 "source": "https://github.com/laravel/sanctum"
             },
-            "time": "2020-11-24T17:31:19+00:00"
+            "time": "2021-01-26T19:47:38+00:00"
         },
         {
             "name": "laravel/tinker",
-            "version": "v2.5.0",
+            "version": "v2.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/tinker.git",
-                "reference": "45884b526e10a88a1b179fa1a1a24d5468c668c2"
+                "reference": "daae1c43f1300fe88c05d83db6f3d8f76677ad88"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/tinker/zipball/45884b526e10a88a1b179fa1a1a24d5468c668c2",
-                "reference": "45884b526e10a88a1b179fa1a1a24d5468c668c2",
+                "url": "https://api.github.com/repos/laravel/tinker/zipball/daae1c43f1300fe88c05d83db6f3d8f76677ad88",
+                "reference": "daae1c43f1300fe88c05d83db6f3d8f76677ad88",
                 "shasum": ""
             },
             "require": {
@@ -2516,9 +2517,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/tinker/issues",
-                "source": "https://github.com/laravel/tinker/tree/v2.5.0"
+                "source": "https://github.com/laravel/tinker/tree/v2.6.0"
             },
-            "time": "2020-10-29T13:07:12+00:00"
+            "time": "2021-01-26T20:35:18+00:00"
         },
         {
             "name": "laravel/ui",
@@ -3708,16 +3709,16 @@
         },
         {
             "name": "ramsey/collection",
-            "version": "1.1.1",
+            "version": "1.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ramsey/collection.git",
-                "reference": "24d93aefb2cd786b7edd9f45b554aea20b28b9b1"
+                "reference": "28a5c4ab2f5111db6a60b2b4ec84057e0f43b9c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ramsey/collection/zipball/24d93aefb2cd786b7edd9f45b554aea20b28b9b1",
-                "reference": "24d93aefb2cd786b7edd9f45b554aea20b28b9b1",
+                "url": "https://api.github.com/repos/ramsey/collection/zipball/28a5c4ab2f5111db6a60b2b4ec84057e0f43b9c1",
+                "reference": "28a5c4ab2f5111db6a60b2b4ec84057e0f43b9c1",
                 "shasum": ""
             },
             "require": {
@@ -3727,19 +3728,19 @@
                 "captainhook/captainhook": "^5.3",
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
                 "ergebnis/composer-normalize": "^2.6",
-                "fzaninotto/faker": "^1.5",
+                "fakerphp/faker": "^1.5",
                 "hamcrest/hamcrest-php": "^2",
-                "jangregor/phpstan-prophecy": "^0.6",
+                "jangregor/phpstan-prophecy": "^0.8",
                 "mockery/mockery": "^1.3",
                 "phpstan/extension-installer": "^1",
                 "phpstan/phpstan": "^0.12.32",
                 "phpstan/phpstan-mockery": "^0.12.5",
                 "phpstan/phpstan-phpunit": "^0.12.11",
-                "phpunit/phpunit": "^8.5",
+                "phpunit/phpunit": "^8.5 || ^9",
                 "psy/psysh": "^0.10.4",
                 "slevomat/coding-standard": "^6.3",
                 "squizlabs/php_codesniffer": "^3.5",
-                "vimeo/psalm": "^3.12.2"
+                "vimeo/psalm": "^4.4"
             },
             "type": "library",
             "autoload": {
@@ -3769,15 +3770,19 @@
             ],
             "support": {
                 "issues": "https://github.com/ramsey/collection/issues",
-                "source": "https://github.com/ramsey/collection/tree/1.1.1"
+                "source": "https://github.com/ramsey/collection/tree/1.1.3"
             },
             "funding": [
                 {
                     "url": "https://github.com/ramsey",
                     "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/ramsey/collection",
+                    "type": "tidelift"
                 }
             ],
-            "time": "2020-09-10T20:58:17+00:00"
+            "time": "2021-01-21T17:40:04+00:00"
         },
         {
             "name": "ramsey/uuid",
@@ -6913,12 +6918,12 @@
             "version": "1.9.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/webmozart/assert.git",
+                "url": "https://github.com/webmozarts/assert.git",
                 "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/bafc69caeb4d49c39fd0779086c03a3738cbb389",
+                "url": "https://api.github.com/repos/webmozarts/assert/zipball/bafc69caeb4d49c39fd0779086c03a3738cbb389",
                 "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389",
                 "shasum": ""
             },
@@ -6956,8 +6961,8 @@
                 "validate"
             ],
             "support": {
-                "issues": "https://github.com/webmozart/assert/issues",
-                "source": "https://github.com/webmozart/assert/tree/master"
+                "issues": "https://github.com/webmozarts/assert/issues",
+                "source": "https://github.com/webmozarts/assert/tree/1.9.1"
             },
             "time": "2020-07-08T17:02:28+00:00"
         }
@@ -7180,16 +7185,16 @@
         },
         {
             "name": "facade/ignition",
-            "version": "2.5.8",
+            "version": "2.5.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facade/ignition.git",
-                "reference": "8e907d81244649c5ea746e2ec30c32c5f59df472"
+                "reference": "66b3138ecce38024723fb3bfc66ef8852a779ea9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facade/ignition/zipball/8e907d81244649c5ea746e2ec30c32c5f59df472",
-                "reference": "8e907d81244649c5ea746e2ec30c32c5f59df472",
+                "url": "https://api.github.com/repos/facade/ignition/zipball/66b3138ecce38024723fb3bfc66ef8852a779ea9",
+                "reference": "66b3138ecce38024723fb3bfc66ef8852a779ea9",
                 "shasum": ""
             },
             "require": {
@@ -7253,7 +7258,7 @@
                 "issues": "https://github.com/facade/ignition/issues",
                 "source": "https://github.com/facade/ignition"
             },
-            "time": "2020-12-29T09:12:55+00:00"
+            "time": "2021-01-26T14:45:19+00:00"
         },
         {
             "name": "facade/ignition-contracts",
@@ -7362,16 +7367,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.9.1",
+            "version": "2.9.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "307fb34a5ab697461ec4c9db865b20ff2fd40771"
+                "reference": "df7933820090489623ce0be5e85c7e693638e536"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/307fb34a5ab697461ec4c9db865b20ff2fd40771",
-                "reference": "307fb34a5ab697461ec4c9db865b20ff2fd40771",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/df7933820090489623ce0be5e85c7e693638e536",
+                "reference": "df7933820090489623ce0be5e85c7e693638e536",
                 "shasum": ""
             },
             "require": {
@@ -7421,9 +7426,15 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.9.1"
+                "source": "https://github.com/filp/whoops/tree/2.9.2"
             },
-            "time": "2020-11-01T12:00:00+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/denis-sokolov",
+                    "type": "github"
+                }
+            ],
+            "time": "2021-01-24T12:00:00+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -7732,16 +7743,16 @@
         },
         {
             "name": "nunomaduro/collision",
-            "version": "v5.2.0",
+            "version": "v5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/collision.git",
-                "reference": "aca954fd03414ba0dd85d7d8e42ba9b251893d1f"
+                "reference": "aca63581f380f63a492b1e3114604e411e39133a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/aca954fd03414ba0dd85d7d8e42ba9b251893d1f",
-                "reference": "aca954fd03414ba0dd85d7d8e42ba9b251893d1f",
+                "url": "https://api.github.com/repos/nunomaduro/collision/zipball/aca63581f380f63a492b1e3114604e411e39133a",
+                "reference": "aca63581f380f63a492b1e3114604e411e39133a",
                 "shasum": ""
             },
             "require": {
@@ -7816,7 +7827,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-01-13T10:00:08+00:00"
+            "time": "2021-01-25T15:34:13+00:00"
         },
         {
             "name": "phar-io/manifest",
