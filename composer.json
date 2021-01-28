@@ -25,6 +25,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",
+        "brianium/paratest": "^6.1",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "jeroenzwart/laravel-csv-seeder": "^1.4",
