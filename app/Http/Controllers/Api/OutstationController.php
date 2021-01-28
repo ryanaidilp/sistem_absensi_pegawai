@@ -25,7 +25,7 @@ class OutstationController extends Controller
      */
     public function index(Request $request)
     {
-        $outstations = $this->outstationRepository->getByUser($request->user()->id);
+        $outstations = $this->outstationRepository->getByUserAndMonth($request);
         $outstations = fractal()
             ->collection($outstations, new OutstationTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -92,11 +92,12 @@ class OutstationController extends Controller
      */
     public function all(Request $request)
     {
+        $date = $request->has('date') ? $request->date : today();
         if ($request->user()->position !== 'Camat') {
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
-        $outstations = $this->outstationRepository->all();
+        $outstations = $this->outstationRepository->getBetweenDate($date);
         $outstations = fractal()->collection($outstations, new EmployeeOutstationTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
 
@@ -164,6 +165,10 @@ class OutstationController extends Controller
                 'photo' => 'required',
                 'file_name' => 'required'
             ],
+            [
+                'photo.required' => 'Foto tidak berbeda dari foto sebelumnya!',
+                'file_name.required' => 'Nama file baru tidak terdeteksi!'
+            ]
         );
 
         if ($validator->fails()) {

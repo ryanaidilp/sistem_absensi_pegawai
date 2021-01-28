@@ -29,7 +29,7 @@ class PaidLeaveController extends Controller
      */
     public function index(Request $request)
     {
-        $paidLeaves = $this->paidLeaveRepository->getByUser($request->user()->id);
+        $paidLeaves = $this->paidLeaveRepository->getByUserAndMonth($request);
         $paidLeaves = fractal()
             ->collection($paidLeaves, new PaidLeaveTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -150,10 +150,11 @@ class PaidLeaveController extends Controller
      */
     public function all(Request $request)
     {
+        $date = $request->has('date') ? $request->date : today();
         if ($request->user()->position !== 'Camat') {
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses menu ini!']);
         }
-        $paidLeaves = $this->paidLeaveRepository->all();
+        $paidLeaves = $this->paidLeaveRepository->getBetweenDate($date);
         $paidLeaves = fractal()->collection($paidLeaves, new EmployeePaidLeaveTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
         return setJson(true, 'Berhasil', $paidLeaves, 200, []);
@@ -217,6 +218,10 @@ class PaidLeaveController extends Controller
                 'photo' => 'required',
                 'file_name' => 'required'
             ],
+            [
+                'photo.required' => 'Foto tidak berbeda dari foto sebelumnya!',
+                'file_name.required' => 'Nama file baru tidak terdeteksi!'
+            ]
         );
 
         if ($validator->fails()) {
