@@ -110,8 +110,11 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
 
     public function getBetweenDate($date)
     {
-        return AbsentPermission::with(['user', 'user.departemen'])->whereDate('start_date', '<=', $date)
-            ->whereDate('due_date', '>=', $date)->get();
+        $date = Carbon::parse($date);
+        return AbsentPermission::with(['user', 'user.departemen', 'status'])
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('due_date', '>=', $date)
+            ->orderBy('created_at', 'desc')->get();
     }
 
     public function getByUserAndYear($userId, $year)
@@ -122,6 +125,15 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
         ])
             ->whereYear('created_at', $year)
             ->get();
+    }
+
+    public function getByUserAndMonth(Request $request)
+    {
+        $date = Carbon::parse($request->date);
+        return AbsentPermission::where('user_id', $request->user()->id)
+            ->whereMonth('created_at', $date->month)
+            ->whereYear('created_at', $date->year)
+            ->latest()->get();
     }
 
     public function getByUserAndStartDate($userId, $startDate)
