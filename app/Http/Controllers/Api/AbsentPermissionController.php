@@ -27,7 +27,7 @@ class AbsentPermissionController extends Controller
      */
     public function index(Request $request)
     {
-        $permissions = $this->absentPermissionRepository->getByUser($request->user()->id);
+        $permissions = $this->absentPermissionRepository->getByUserAndMonth($request);
         $permissions = fractal()
             ->collection($permissions, new AbsentPermissionTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
@@ -99,11 +99,12 @@ class AbsentPermissionController extends Controller
      */
     public function all(Request $request)
     {
+        $date = $request->has('date') ? $request->date : today();
         if ($request->user()->position !== 'Camat') {
             return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
         }
 
-        $permissions = $this->absentPermissionRepository->all();
+        $permissions = $this->absentPermissionRepository->getBetweenDate($date);
         $permissions = fractal()->collection($permissions, new EmployeePermissionTransformer)
             ->serializeWith(new CustomSerializer)->toArray();
 
@@ -171,6 +172,10 @@ class AbsentPermissionController extends Controller
                 'photo' => 'required',
                 'file_name' => 'required'
             ],
+            [
+                'photo.required' => 'Foto tidak berbeda dari foto sebelumnya!',
+                'file_name.required' => 'Nama file baru tidak terdeteksi!'
+            ]
         );
 
         if ($validator->fails()) {

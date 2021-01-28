@@ -13,6 +13,7 @@ interface PaidLeaveRepositoryInterface
     public function updatePicture(Request $request);
     public function getBetweenDate($date);
     public function getByUserAndYear($userId, $year);
+    public function getByUserAndMonth(Request $request);
     public function getByUserAndCategory($userId, $categoryId);
     public function getByUserAndStartDate($userId, $startDate);
 }

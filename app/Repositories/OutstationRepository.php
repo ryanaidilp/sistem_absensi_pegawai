@@ -104,8 +104,20 @@ class OutstationRepository implements OutstationRepositoryInterface
 
     public function getBetweenDate($date)
     {
-        return Outstation::with(['user'])->whereDate('start_date', '<=', $date)
-            ->whereDate('due_date', '>=', $date)->get();
+        $date = Carbon::parse($date);
+        return Outstation::with(['user', 'user.departemen', 'status'])
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('due_date', '>=', $date)
+            ->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getByUserAndMonth(Request $request)
+    {
+        $date = Carbon::parse($request->date);
+        return Outstation::where('user_id', $request->user()->id)
+            ->whereMonth('created_at', $date->month)
+            ->whereYear('created_at', $date->year)
+            ->latest()->get();
     }
 
     public function getByUserAndYear($userId, $year)
