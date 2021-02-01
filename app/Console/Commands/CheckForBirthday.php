@@ -40,7 +40,8 @@ class CheckForBirthday extends Command
      */
     public function handle()
     {
-        $users = User::whereDate('date_of_birth', today())->get();
+        $users = User::whereMonth('date_of_birth', today()->format('m'))
+            ->whereDay('date_of_birth', today()->format('d'))->get();
         if ($users->count() > 0) {
             foreach ($users as $user) {
                 $dob = Carbon::parse($user->date_of_birth);
