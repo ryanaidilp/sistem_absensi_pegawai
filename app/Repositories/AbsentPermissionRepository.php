@@ -139,9 +139,8 @@ class AbsentPermissionRepository implements AbsentPermissionRepositoryInterface
     public function getByUserAndStartDate($userId, $startDate)
     {
         return AbsentPermission::whereDate('start_date', Carbon::parse($startDate))
-            ->where([
-                ['user_id', $userId],
-                ['is_approved', true]
-            ])->get();
+            ->where('user_id', $userId)
+            ->whereIn('approval_status_id', [AbsentPermission::APPROVED, AbsentPermission::PENDING])
+            ->get();
     }
 }

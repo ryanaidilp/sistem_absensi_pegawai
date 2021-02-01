@@ -135,6 +135,7 @@ class OutstationRepository implements OutstationRepositoryInterface
     {
         return Outstation::whereDate('start_date', Carbon::parse($startDate))
             ->where('user_id', $userId)
+            ->whereIn('approval_status_id', [Outstation::APPROVED, Outstation::PENDING])
             ->first();
     }
 }

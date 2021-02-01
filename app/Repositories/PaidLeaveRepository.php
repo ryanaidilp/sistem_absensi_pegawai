@@ -142,8 +142,9 @@ class PaidLeaveRepository implements PaidLeaveRepositoryInterface
         return PaidLeave::whereYear('start_date', now()->year)
             ->where([
                 ['user_id', $userId],
-                ['is_approved', true],
                 ['leave_category_id', $categoryId]
-            ])->get();
+            ])
+            ->whereIn('approval_status_id', [PaidLeave::APPROVED, PaidLeave::PENDING])
+            ->get();
     }
 }
