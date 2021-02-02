@@ -2,13 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
-use App\Notifications\BirthdayNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use App\Notifications\BirthdayNotification;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 
 class CheckForBirthday extends Command
 {
+
+    private $userRepository;
+
     /**
      * The name and signature of the console command.
      *
@@ -28,9 +31,10 @@ class CheckForBirthday extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(UserRepositoryInterface $userRepository)
     {
         parent::__construct();
+        $this->userRepository = $userRepository;
     }
 
     /**
@@ -40,8 +44,7 @@ class CheckForBirthday extends Command
      */
     public function handle()
     {
-        $users = User::whereMonth('date_of_birth', today()->format('m'))
-            ->whereDay('date_of_birth', today()->format('d'))->get();
+        $users = $this->userRepository->allByBirthday(today());
         if ($users->count() > 0) {
             foreach ($users as $user) {
                 $dob = Carbon::parse($user->date_of_birth);
