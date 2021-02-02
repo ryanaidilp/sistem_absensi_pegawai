@@ -49,7 +49,7 @@ class CheckForBirthday extends Command
             foreach ($users as $user) {
                 $dob = Carbon::parse($user->date_of_birth);
                 $user->notify(new BirthdayNotification);
-                sendNotification("$user->name berulang tahun yang ke {$dob->age} tahun hari ini. Berikan doa dan ucapan terbaik kalian.", "Ulang tahun hari ini, " . today()->translatedFormat('l, d F Y') . "!");
+                sendNotification("$user->name berulang tahun yang ke-{$dob->age} hari ini. Berikan doa dan ucapan terbaik kalian.", "Ulang tahun hari ini, " . today()->translatedFormat('l, d F Y') . "!");
             }
             $this->info('Successfully send birthday message');
         } else {
