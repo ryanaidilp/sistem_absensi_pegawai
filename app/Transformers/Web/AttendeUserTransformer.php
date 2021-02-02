@@ -42,6 +42,7 @@ class AttendeUserTransformer extends TransformerAbstract
             'name' => $user->name,
             'status' => $user->status,
             'nip' => $user->nip,
+            'gender' => $user->gender->name,
             'department' => $user->departemen->name,
             'position' => $user->position,
             'presensi' => $this->presence
