@@ -25,4 +25,12 @@ class UserRepository implements UserRepositoryInterface
             return $query->pns()->orWhere->honorer();
         })->with(['departemen', 'golongan'])->where('id', '!=', $exceptId)->get();
     }
+
+    public function allByBirthday($birthday)
+    {
+        return User::where(function ($query) {
+            return $query->pns()->orWhere->honorer();
+        })->whereMonth('date_of_birth', $birthday->format('m'))
+            ->whereDay('date_of_birth', $birthday->format('d'))->get();
+    }
 }
