@@ -57,8 +57,6 @@ class HonorerAttendeSheet implements
             return array_merge($user, ['presensi' => $presences]);
         });
 
-        dd($users->first());
-
         return $users;
     }
 
