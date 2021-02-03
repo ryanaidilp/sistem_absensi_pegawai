@@ -46,6 +46,27 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
   * ***Latitude & Longirude Offset***
     Data ini diperlukan untuk mengecek jarak user dari kantor saat melakukan presensi. Hal ini dilakukan untuk memastikan bahwa user melakukan presensi di kantor.
 
+* Konfigurasi
+  * ***Clone*** *repository* ini
+  * Jalankan perintah `composer install` & `npm install`
+  * Setelah semua module npm terinstall, jalankan perintah `npm run watch`
+  * Isikan konfigurasi ***database*** anda pada file **.env**
+  * Jalankan perintah `php artisan voyager:install` untuk menginstall *admin panel* Voyager
+  * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create`
+  * Buat file csv berisi data user dan department lalu masukkan ke dalam folder database dengan struktur
+
+    ```
+    ├── ...
+    ├── database
+    │   ├── users.csv
+    │   └── departments.csv
+    └── ...
+    ```
+
+  * Jalankan perintah `php artisan db:seed`, jika tidak ada file csv pada proses sebelumnya, *comment*/hilangkan **UserSeeder** & **DepartmentSeeder** dari **DatabaseSeeder.php** sebelum menjalankan seeder
+  * Buat kode absen dengan jalankan perintah `php artisan absent:code` lalu buat daftar absen dengan perintah `php artisan absent:attende`. Pastikan data **User** sudah ada.
+  * Jalankan perintah `php artisan serve` lalu kunjungi url **localhost:8000**
+
 ## To-Do List
 
 * [ ] Visualisasi data kehadiran pegawai (PNS & Honorer).
