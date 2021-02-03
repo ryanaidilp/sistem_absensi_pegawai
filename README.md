@@ -56,8 +56,8 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
   * Buat file csv berisi data user dan department lalu masukkan ke dalam folder database dengan struktur
 
     ```
-    ├── ...
     ├── database
+      ├── csv
     │   ├── users.csv
     │   └── departments.csv
     └── ...
