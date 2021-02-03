@@ -24,7 +24,42 @@
         />
       </div>
     </div>
-
+    <div class="mt-4 mb-2 text-xl font-bold">Unduh Data</div>
+    <div class="grid w-full grid-cols-2 gap-6 mb-4 lg:grid-cols-4">
+      <a
+        :href="`${route('download')}?type=daily&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="bg-yellow-500 hover:bg-yellow-600 btn"
+      >
+        Harian ({{ date }})
+      </a>
+      <a
+        :href="`${route('download')}?type=monthly&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="bg-indigo-500 btn hover:bg-indigo-600"
+      >
+        Bulanan ({{ Intl.DateTimeFormat('id-ID', {month:'long'}).format(placeholderDate) }})
+      </a>
+      <a
+        :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="bg-red-600 btn hover:bg-red-700"
+      >
+        Tahunan (PNS/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})
+      </a>
+      <a
+        :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
+          placeholderDate
+        )}&employee=Honorer`"
+        class="btn btn-primary"
+      >
+        Tahunan (Honorer/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})
+      </a>
+    </div>
+    <div class="my-4 text-xl font-bold">Tabel Absensi</div>
     <div class="text-center border-transparent rounded-lg shadow-lg">
       <div
         class="p-4 text-white uppercase bg-gray-500 border-b-2 border-gray-500 rounded-tl-lg rounded-tr-lg"
@@ -208,15 +243,9 @@
         >
       </p>
     </div>
-    <viewer
-      :images="images"
-      
-      @inited="inited"
-      class="viewer"
-      ref="viewer"
-    >
+    <viewer :images="images" @inited="inited" class="viewer" ref="viewer">
       <template slot-scope="scope">
-        <img v-for="src in scope.images" :src="src" :key="src" class="hidden"/>
+        <img v-for="src in scope.images" :src="src" :key="src" class="hidden" />
         {{ scope.options }}
       </template>
     </viewer>
@@ -363,13 +392,8 @@ export default {
         },
 
         dom: "Bfrtip",
-        buttons: [
-          "pageLength",
-          {
-            extend: "excel",
-            title: `Daftar Hadir Pegawai ${title} Kantor Camat Balaesang. ${this.date}`,
-          },
-        ],
+        pageLength: 25,
+        buttons: ["pageLength"],
         // order: [[1, "asc"]],
         data: data,
         columns: columns,
