@@ -25,38 +25,38 @@
       </div>
     </div>
     <div class="mt-4 mb-2 text-xl font-bold">Unduh Data</div>
-    <div class="grid w-full grid-cols-2 gap-6 mb-4 lg:grid-cols-4">
+    <div class="grid w-full grid-cols-1 gap-6 mb-4 sm:grid-cols-2 lg:grid-cols-4">
       <a
         :href="`${route('download')}?type=daily&date=${momentFormat.stringify(
           placeholderDate
         )}`"
-        class="bg-yellow-500 hover:bg-yellow-600 btn"
+        class="font-bold bg-yellow-200 hover:bg-yellow-300 btn"
       >
-        Harian ({{ date }})
+        <p class="text-yellow-800">Harian ({{ date }})</p>
       </a>
       <a
         :href="`${route('download')}?type=monthly&date=${momentFormat.stringify(
           placeholderDate
         )}`"
-        class="bg-indigo-500 btn hover:bg-indigo-600"
+        class="font-bold bg-indigo-200 btn hover:bg-indigo-300"
       >
-        Bulanan ({{ Intl.DateTimeFormat('id-ID', {month:'long'}).format(placeholderDate) }})
+        <p class="text-indigo-800">Bulanan ({{ Intl.DateTimeFormat('id-ID', {month:'long'}).format(placeholderDate) }})</p>
       </a>
       <a
         :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
           placeholderDate
         )}`"
-        class="bg-red-600 btn hover:bg-red-700"
+        class="font-bold bg-red-200 btn hover:bg-red-300"
       >
-        Tahunan (PNS/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})
+        <p class="text-red-800">Tahunan (PNS/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})</p>
       </a>
       <a
         :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
           placeholderDate
         )}&employee=Honorer`"
-        class="btn btn-primary"
+        class="font-bold bg-blue-200 btn hover:bg-blue-300"
       >
-        Tahunan (Honorer/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})
+        <p class="text-blue-800">Tahunan (Honorer/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})</p>
       </a>
     </div>
     <div class="my-4 text-xl font-bold">Tabel Absensi</div>
