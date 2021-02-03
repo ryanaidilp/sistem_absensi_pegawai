@@ -2,9 +2,9 @@
 
 namespace App\Transformers;
 
-use App\Models\Holiday;
 use App\Models\User;
-use App\Transformers\Serializers\CustomSerializer;
+use App\Models\Holiday;
+use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
@@ -53,9 +53,9 @@ class UserTransformer extends TransformerAbstract
         }
         return [
             'id' => $user->id,
-            'nip' => $user->nip,
-            'rank' => optional($user->golongan)->rank,
-            'group' => optional($user->golongan)->group,
+            'nip' => $user->nip ?? '',
+            'rank' => Str::replaceFirst('Tingkat', 'Tk.', optional($user->golongan)->rank ?? ''),
+            'group' => optional($user->golongan)->group ?? '',
             'name' => $user->name,
             'phone' => $user->phone,
             'gender' => $user->gender->name,
