@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
 
 class AllUserTransformers extends TransformerAbstract
@@ -41,8 +42,8 @@ class AllUserTransformers extends TransformerAbstract
         return [
             'nip' => $user->nip ?? "",
             'name' => $user->name,
-            'rank' => optional($user->golongan)->rank,
-            'group' => optional($user->golongan)->group,
+            'rank' => Str::replaceFirst('Tingkat', 'Tk.', optional($user->golongan)->rank ?? ''),
+            'group' => optional($user->golongan)->group ?? '',
             'status' => $user->status,
             'department' => $user->departemen->name,
             'position' => $user->position,
