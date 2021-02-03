@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Exports\AttendeDailyExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AttendeMonthlyExport;
 use Illuminate\Support\Facades\Storage;
 use App\Transformers\Web\AttendeCodeTransformer;
 use App\Transformers\Serializers\CustomSerializer;
@@ -121,6 +125,41 @@ class MainController extends Controller
             'date' => $date->translatedFormat("l, d F Y"),
             'str_date' => $date->format('Y-m-d')
         ]);
+    }
+
+    public function download(Request $request)
+    {
+        $date = $request->has('date') ? Carbon::parse($request->date) : today();
+        $type = $request->has('type') ? $request->type : 'daily';
+        $employee = $request->has('employee') ? $request->employee : null;
+        $fileName = "Daftar Hadir {TIPE} Kantor Camat Balaesang. {TIPE}";
+        $fileName = [
+            'daily' => Str::replaceArray("{TIPE}",  ["Pegawai", $date->translatedFormat('l, d F Y')], $fileName),
+            'monthly' => Str::replaceArray("{TIPE}",  ["Pegawai", "Bulan " . $date->translatedFormat('F Y')], $fileName),
+            'annual'  => Str::replaceArray("{TIPE}",  ["Pegawai $employee", "Tahun " . $date->translatedFormat('Y')], $fileName),
+        ][$type];
+
+        $users = [
+            'daily' => $this->attendeRepository->getByDate($date),
+            'monthly' => $this->attendeRepository->getByMonth($date),
+            'annual' => []
+        ][$type];
+
+        $forExport = [
+            'daily' => false,
+            'monthly' => true,
+            'annual' => true
+        ][$type];
+
+        $users = $this->attendeRepository->formatUserAttendes($users, true, $forExport);
+
+        $export = [
+            'daily' => new AttendeDailyExport($date, $users),
+            'monthly' => new AttendeMonthlyExport($date, $users)
+        ][$type];
+
+
+        return Excel::download($export, "$fileName.xlsx");
     }
 
     private function setTimer($days, $attendeCode)
