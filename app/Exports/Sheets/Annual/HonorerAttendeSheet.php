@@ -45,8 +45,6 @@ class HonorerAttendeSheet implements
     {
         $users = $this->users->filter(function ($user) {
             return $user['status'] === 'Honorer';
-        })->sortByDesc(function ($user) {
-            return collect($user['presensi'])->average('percentage');
         })->values();
 
         $users = $users->map(function ($user) {
@@ -55,6 +53,8 @@ class HonorerAttendeSheet implements
                 return Carbon::parse($presence['date'])->month === $this->month;
             })->values();
             return array_merge($user, ['presensi' => $presences]);
+        })->sortByDesc(function ($user) {
+            return collect($user['presensi'])->average('percentage');
         });
 
         return $users;
