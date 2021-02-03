@@ -157,7 +157,7 @@ class MainController extends Controller
         $export = [
             'daily' => new AttendeDailyExport($date, $users),
             'monthly' => new AttendeMonthlyExport($date, $users),
-            'annual' => new AttendeAnnualExport($date, $users, $type)
+            'annual' => new AttendeAnnualExport($date, $users, $employee)
         ][$type];
 
         return Excel::download($export, "$fileName.xlsx");
