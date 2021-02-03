@@ -3,6 +3,7 @@
 namespace App\Transformers\Web;
 
 use App\Models\User;
+use Illuminate\Support\Str;
 use League\Fractal\TransformerAbstract;
 
 class AttendeUserTransformer extends TransformerAbstract
@@ -40,10 +41,13 @@ class AttendeUserTransformer extends TransformerAbstract
     {
         return [
             'name' => $user->name,
-            'status' => $user->status,
-            'nip' => $user->nip,
             'department' => $user->departemen->name,
             'position' => $user->position,
+            'gender' => $user->gender->name,
+            'status' => $user->status,
+            'nip' => optional($user)->nip ?? '',
+            'group' => optional($user->golongan)->group ?? '',
+            'rank' => Str::replaceFirst('Tingkat', 'Tk.', optional($user->golongan)->rank) ?? '',
             'presensi' => $this->presence
         ];
     }

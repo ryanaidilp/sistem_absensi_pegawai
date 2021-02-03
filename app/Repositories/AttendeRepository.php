@@ -14,32 +14,70 @@ use App\Transformers\Web\AttendeUserTransformer;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Notifications\AttendanceCanceledNotification;
 use App\Repositories\Interfaces\AttendeRepositoryInterface;
+use App\Transformers\Export\AttendeDataTransformer;
+use App\Transformers\Export\UserAttendeTransformer;
 
 class AttendeRepository implements AttendeRepositoryInterface
 {
     public function getByDate($date, $exludeUser = null)
     {
         if (is_null($exludeUser)) {
-            return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'pegawai.departemen', 'pegawai.golongan'])->whereDate('created_at', $date)->get();
+            return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen', 'pegawai.golongan', 'pegawai.gender'])->whereDate('created_at', $date)->get();
         }
-        return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'pegawai.departemen'])
+        return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen', 'pegawai.golongan', 'pegawai.gender'])
             ->whereDate('created_at', $date)
             ->where('user_id', '!=', $exludeUser)
             ->get();
     }
 
-    public function formatUserAttendes($attendes, $forWeb = false)
+    public function getByYear($date)
+    {
+        return Attende::with([
+            'pegawai', 'pegawai.departemen', 'pegawai.golongan',
+            'pegawai.gender', 'status_kehadiran', 'kode_absen'
+        ])->whereYear('created_at', $date->year)
+            ->get();
+    }
+
+    public function getByMonth($date)
+    {
+        return Attende::with([
+            'pegawai', 'pegawai.departemen', 'pegawai.golongan',
+            'pegawai.gender', 'status_kehadiran', 'kode_absen'
+        ])->whereMonth('created_at', $date->month)
+            ->get();
+    }
+
+    public function formatUserAttendes($attendes, $forWeb = false, $forExport = false)
     {
 
         $attendes = $attendes->groupBy('user_id');
-        return $attendes->map(function ($attende) use ($forWeb) {
+        return $attendes->map(function ($attende) use ($forWeb, $forExport) {
             $user = $attende->first()->pegawai;
-            $presenceTransformer = $forWeb ? new AllAttendeTransformer : new AttendeTransformers;
-            $presence = $attende->map(function ($data) use ($presenceTransformer) {
-                return fractal()->item($data)
-                    ->transformWith($presenceTransformer)
-                    ->serializeWith(new CustomSerializer)->toArray();
-            })->toArray();
+            $presenceTransformer = $forWeb ?  new AllAttendeTransformer : new AttendeTransformers;
+            if (!$forExport) {
+                $presence = $attende->map(function ($data) use ($presenceTransformer) {
+                    return fractal()->item($data)
+                        ->transformWith($presenceTransformer)
+                        ->serializeWith(new CustomSerializer)->toArray();
+                })->toArray();
+            } else {
+                $attende = $attende->groupBy(function ($item) {
+                    return $item->created_at->format('d');
+                })->values();
+                $data = array();
+                foreach ($attende as $key => $presence) {
+                    $percentage = 0;
+                    foreach ($presence as $attende) {
+                        $percentage += checkAttendancePercentage($attende->attende_status_id);
+                    }
+                    $data[$key] = [
+                        'date' => $attende->created_at->format('Y-m-d'),
+                        'percentage' => round($percentage / 4, 2)
+                    ];
+                }
+                $presence = $data;
+            }
             $userTransformer = $forWeb ? new AttendeUserTransformer($presence) : new AllUserTransformers($presence);
             return fractal()->item($user)
                 ->transformWith($userTransformer)

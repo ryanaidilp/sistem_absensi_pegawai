@@ -24,7 +24,42 @@
         />
       </div>
     </div>
-
+    <div class="mt-4 mb-2 text-xl font-bold">Unduh Data</div>
+    <div class="grid w-full grid-cols-1 gap-6 mb-4 sm:grid-cols-2 lg:grid-cols-4">
+      <a
+        :href="`${route('download')}?type=daily&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="font-bold bg-yellow-200 hover:bg-yellow-300 btn"
+      >
+        <p class="text-yellow-800">Harian ({{ date }})</p>
+      </a>
+      <a
+        :href="`${route('download')}?type=monthly&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="font-bold bg-indigo-200 btn hover:bg-indigo-300"
+      >
+        <p class="text-indigo-800">Bulanan ({{ Intl.DateTimeFormat('id-ID', {month:'long'}).format(placeholderDate) }})</p>
+      </a>
+      <a
+        :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
+          placeholderDate
+        )}`"
+        class="font-bold bg-red-200 btn hover:bg-red-300"
+      >
+        <p class="text-red-800">Tahunan (PNS/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})</p>
+      </a>
+      <a
+        :href="`${route('download')}?type=annual&date=${momentFormat.stringify(
+          placeholderDate
+        )}&employee=Honorer`"
+        class="font-bold bg-blue-200 btn hover:bg-blue-300"
+      >
+        <p class="text-blue-800">Tahunan (Honorer/{{ Intl.DateTimeFormat('id-ID', {year:'numeric'}).format(placeholderDate) }})</p>
+      </a>
+    </div>
+    <div class="my-4 text-xl font-bold">Tabel Absensi</div>
     <div class="text-center border-transparent rounded-lg shadow-lg">
       <div
         class="p-4 text-white uppercase bg-gray-500 border-b-2 border-gray-500 rounded-tl-lg rounded-tr-lg"
@@ -208,15 +243,9 @@
         >
       </p>
     </div>
-    <viewer
-      :images="images"
-      
-      @inited="inited"
-      class="viewer"
-      ref="viewer"
-    >
+    <viewer :images="images" @inited="inited" class="viewer" ref="viewer">
       <template slot-scope="scope">
-        <img v-for="src in scope.images" :src="src" :key="src" class="hidden"/>
+        <img v-for="src in scope.images" :src="src" :key="src" class="hidden" />
         {{ scope.options }}
       </template>
     </viewer>
@@ -363,13 +392,8 @@ export default {
         },
 
         dom: "Bfrtip",
-        buttons: [
-          "pageLength",
-          {
-            extend: "excel",
-            title: `Daftar Hadir Pegawai ${title} Kantor Camat Balaesang. ${this.date}`,
-          },
-        ],
+        pageLength: 25,
+        buttons: ["pageLength"],
         // order: [[1, "asc"]],
         data: data,
         columns: columns,

@@ -42,6 +42,7 @@ class AllAttendeTransformer extends TransformerAbstract
             $status .= calculateLateTime($attende->kode_absen->start_time, $attende->attend_time, $date);
         }
         return [
+            'percentage' => checkAttendancePercentage($attende->attende_status_id),
             'status' => $status,
             'attend_time' => $attende->attend_time == null ? "-" : Carbon::parse($attende->attend_time)->format('H:i')
         ];
