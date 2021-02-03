@@ -63,7 +63,7 @@ class AttendeRepository implements AttendeRepositoryInterface
                 })->toArray();
             } else {
                 $attende = $attende->groupBy(function ($item) {
-                    return $item->created_at->format('d');
+                    return $item->created_at->format('d-m-Y');
                 })->values();
                 $data = array();
                 foreach ($attende as $key => $presence) {
