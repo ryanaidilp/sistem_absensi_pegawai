@@ -22,9 +22,9 @@ class AttendeRepository implements AttendeRepositoryInterface
     public function getByDate($date, $exludeUser = null)
     {
         if (is_null($exludeUser)) {
-            return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen'])->whereDate('created_at', $date)->get();
+            return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen', 'pegawai.golongan', 'pegawai.gender'])->whereDate('created_at', $date)->get();
         }
-        return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen'])
+        return Attende::with(['pegawai', 'status_kehadiran', 'kode_absen', 'kode_absen.tipe', 'pegawai.departemen', 'pegawai.golongan', 'pegawai.gender'])
             ->whereDate('created_at', $date)
             ->where('user_id', '!=', $exludeUser)
             ->get();
