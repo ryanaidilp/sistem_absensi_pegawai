@@ -45,8 +45,6 @@ class PnsAttendeSheet implements
     {
         $users = $this->users->filter(function ($user) {
             return $user['status'] === 'PNS';
-        })->sortByDesc(function ($user) {
-            return collect($user['presensi'])->average('percentage');
         })->values();
 
         $users = $users->map(function ($user) {
@@ -55,6 +53,8 @@ class PnsAttendeSheet implements
                 return Carbon::parse($presence['date'])->month === $this->month;
             })->values();
             return array_merge($user, ['presensi' => $presences]);
+        })->sortByDesc(function ($user) {
+            return collect($user['presensi'])->average('percentage');
         });
 
         return $users;
