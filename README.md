@@ -57,10 +57,9 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 
     ```
     ├── database
-      ├── csv
-    │   ├── users.csv
-    │   └── departments.csv
-    └── ...
+      └── csv
+        ├── users.csv
+        └── departments.csv
     ```
 
   * Jalankan perintah `php artisan db:seed`, jika tidak ada file csv pada proses sebelumnya, *comment*/hilangkan **UserSeeder** & **DepartmentSeeder** dari **DatabaseSeeder.php** sebelum menjalankan seeder
