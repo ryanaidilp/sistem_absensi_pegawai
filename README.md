@@ -1,14 +1,18 @@
 <p align="center"><img src="https://i.ibb.co/X2tG5vD/logo-siap.png" width="400"></p>
 
 <h1 align="center">
-Sistem Absensi Pegawai (SIAP)
+Sistem Absensi Pegawai (SiAP)
 </h1>
 
 Website berisi *API Backend* dan manajemen data pegawai untuk aplikasi **[SIAP](https://github.com/ryanaidilp/sistem_absensi_pegawai_app)**. Website ini dibangun dengan [Laravel](https://laravel.com), [Tailwind CSS](https://tailwindcss.com/), [Vue JS](https://vuejs.org), dan [Inertia JS](https://inertiajs.com). Website ini juga memiliki halaman absensi (QR Code) dan tabel untuk menampilkan data kehadiran pegawai.
 
 <p align="center">
-<img src="https://i.ibb.co/rGYjC8F/image.png"/>
-<img src="https://i.ibb.co/DYkXdzM/Untitled-1.jpg"/>
+<img src="https://i.ibb.co/ZVyHrMh/screely-1611734499039.png"/>
+<img src="https://i.ibb.co/3vMYDqg/screely-1612410329484.png"/>
+<img src="https://i.ibb.co/dmDLn5J/screely-1612410516708.png"/>
+<img src="https://i.ibb.co/6ZbqRDY/screely-1612410549780.png"/>
+<img src="https://i.ibb.co/BGrbd4D/screely-1612410576769.png"/>
+<img src="https://i.ibb.co/6vTB6zc/screely-1612410606804.png"/>
 </p>
 
 ## About
@@ -38,15 +42,18 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
     ```
 
   * ***Calendarific Key***
+
     *Calendarific Key* diperlukan untuk mendapatkan data hari libur nasional dari [Calendarific API](https://calendarific.com/).
 
   * ***One Signal APP_ID, API_KEY, & API_URL***
+
     Variabel ini diperlukan untuk mengirim ***push notification*** ke aplikasi [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap). Untuk mendapatkan data ini, silahkan buat akun di [One Signal](https://app.onesignal.com) lalu ikuti petunjuk pada dokumentasi resminya.
 
   * ***Latitude & Longirude Offset***
+
     Data ini diperlukan untuk mengecek jarak user dari kantor saat melakukan presensi. Hal ini dilakukan untuk memastikan bahwa user melakukan presensi di kantor.
 
-* Konfigurasi
+* **Konfigurasi**
   * ***Clone*** *repository* ini
   * Jalankan perintah `composer install` & `npm install`
   * Setelah semua module npm terinstall, jalankan perintah `npm run watch`
@@ -55,12 +62,14 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
   * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create`
   * Buat file csv berisi data user dan department lalu masukkan ke dalam folder database dengan struktur
 
-    ```
+    ```directory
     ├── database
       └── csv
         ├── users.csv
         └── departments.csv
     ```
+
+    pastikan struktur data pada csv sesuai dengan struktur tabel.
 
   * Jalankan perintah `php artisan db:seed`, jika tidak ada file csv pada proses sebelumnya, *comment*/hilangkan **UserSeeder** & **DepartmentSeeder** dari **DatabaseSeeder.php** sebelum menjalankan seeder
   * Buat kode absen dengan jalankan perintah `php artisan absent:code` lalu buat daftar absen dengan perintah `php artisan absent:attende`. Pastikan data **User** sudah ada.
@@ -73,4 +82,4 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 
 ## License
 
-**SIAP** is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+**SIAP** is open-sourced software licensed under the [GPL v2.0](https://www.gnu.org/licenses/gpl-2.0.html).
