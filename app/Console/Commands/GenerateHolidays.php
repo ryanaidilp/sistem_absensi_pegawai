@@ -14,7 +14,7 @@ class GenerateHolidays extends Command
      *
      * @var string
      */
-    protected $signature = 'holiday:generate';
+    protected $signature = 'holiday:generate {--year=2021 : Year of holidays.}';
 
     /**
      * The console command description.
@@ -40,10 +40,11 @@ class GenerateHolidays extends Command
      */
     public function handle()
     {
+        $year = (int) $this->option('year');
         $dates = Calendarific::make(
             env('CALENDARIFIC_KEY'),
             'ID',
-            now()->addYear()->year,
+            $year,
             null,
             null,
             null,
