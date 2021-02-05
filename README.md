@@ -26,6 +26,8 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 * Halaman absensi yang menampilkan ***QR Code*** untuk di-*scan* oleh pegawai menggunakan aplikasi [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap) Android.
 * Halaman cetak yang menampilkan tabel data kehadiran pegawai (PNS & Honorer). Halaman ini juga menampilkan daftar Izin, Dinas Luar, dan Cuti di hari berjalan.
 * Halaman administrator menggunakan [Voyager](https://voyager.devdojo.com/)
+* ***API Backend*** untuk [SiAP](https://play.google.com/store/apps/details?id=com.banuacoders.siap)
+* ***Export*** daftar hadir harian, bulanan, dan tahunan ke dalam file excel (.xlsx)
 
 ## Konfigurasi
 
@@ -72,13 +74,19 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
     pastikan struktur data pada csv sesuai dengan struktur tabel.
 
   * Jalankan perintah `php artisan db:seed`, jika tidak ada file csv pada proses sebelumnya, *comment*/hilangkan **UserSeeder** & **DepartmentSeeder** dari **DatabaseSeeder.php** sebelum menjalankan seeder
-  * Buat kode absen dengan jalankan perintah `php artisan absent:code` lalu buat daftar absen dengan perintah `php artisan absent:attende`. Pastikan data **User** sudah ada.
+  * Untuk mengambil dan menyimpan data hari libur nasional, jalankan perintah  `php artisan holiday:generate` tambahkan option  `--year` untuk menentukan tahun libur yang di-generate (default  `--year=2021`). **Pastikan anda suda mendapatkan API Key dari** [Calendarific API](https://calendarific.com/).
+  * Buat kode absen dengan jalankan perintah `php artisan absent:code` lalu buat daftar absen dengan perintah `php artisan absent:attende`. Pastikan data **User** dan **Department** sudah ada saat menjalankan perintah ini.
   * Jalankan perintah `php artisan serve` lalu kunjungi url **localhost:8000**
 
 ## To-Do List
 
-* [ ] Visualisasi data kehadiran pegawai (PNS & Honorer).
-* [ ] Tracking performa pegawai (PNS & Honorer)
+* [x] Halaman menampilkan **QR Code** dan ***Countdown Timer***.
+* [x] ***API Backend*** untuk ***Mobile App***.
+* [x] ***Tracking*** performa pegawai (PNS & Honorer)
+* [x] **Export** data laporan kehadiran (Excel)
+  * [x] Harian
+  * [x] Bulanan
+  * [x] Tahunan
 
 ## License
 

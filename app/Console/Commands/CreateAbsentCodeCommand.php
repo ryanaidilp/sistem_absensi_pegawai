@@ -49,8 +49,9 @@ class CreateAbsentCodeCommand extends Command
         $types = AttendeType::all();
 
         $holiday = $this->holidayRepository->getToday();
+        $isWeekend = today()->isWeekend();
 
-        if (!$holiday) {
+        if (!$holiday && !$isWeekend) {
             foreach ($types as $type) {
                 do {
                     $code = Str::random(rand(8, 16));
@@ -78,8 +79,12 @@ class CreateAbsentCodeCommand extends Command
                 );
             }
             $this->info('Succesfully created absent code!');
-        } else {
+        } else if ($holiday) {
             $this->info('Today is holiday!');
+        } else if ($isWeekend) {
+            $this->info('Today is weekend!');
+        } else {
+            $this->error('Errors : Failed to generate absent code!');
         }
         return 0;
     }
