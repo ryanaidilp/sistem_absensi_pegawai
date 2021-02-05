@@ -60,7 +60,9 @@ class Kernel extends ConsoleKernel
             ->onFailure(function () {
                 Log::info('failed_to_generate_attende_list');
             });
-        $schedule->command('holiday:generate')->yearlyOn(12, 31, '18:00');
+        $schedule->command('holiday:generate', [
+            '--year' => now()->addYear()->year
+        ])->yearlyOn(12, 31, '18:00');
     }
 
     /**
