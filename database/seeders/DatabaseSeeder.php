@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             AttendeTypeSeeder::class,
             AttendeStatusSeeder::class,
             LeaveCategorySeeder::class,
+            ApprovalStatusSeeder::class,
             GovernmentEmployeeGroupSeeder::class
         ]);
     }
