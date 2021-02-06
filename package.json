@@ -23,13 +23,13 @@
         "popper.js": "^1.12",
         "postcss": "^7.0.35",
         "resolve-url-loader": "^3.1.2",
-        "sass": "^1.32.5",
+        "sass": "^1.32.6",
         "sass-loader": "^8.0.0",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
         "vue": "^2.5.17",
         "vue-chartjs": "^3.5.1",
         "vue-template-compiler": "^2.6.10",
-        "vue2-datepicker": "^3.8.2",
+        "vue2-datepicker": "^3.9.0",
         "vue2-flip-countdown": "^0.11.1"
     },
     "dependencies": {
