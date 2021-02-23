@@ -1,0 +1,2 @@
+id;name;email;phone;date_of_birth;nip;government_employee_group_id;gender_id;department_id;position;status;email_verified_at;password;remember_token;created_at;updated_at
+1;Admin;admin@mail.com;82123456789;01/02/2020;704170751;NULL;1;1;Admin;PNS;NULL;admin123;;;

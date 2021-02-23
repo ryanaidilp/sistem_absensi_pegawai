@@ -51,7 +51,7 @@ class AbsentPermissionExpiredNotification extends Notification
     {
         $date = today()->translatedFormat('l, d F Y');
         $izin = $this->permission;
-        $headings = "Izin kedaluarsa. $date";
+        $headings = now()->translatedFormat('d-m-Y H:i:s') . " - Izin kedaluarsa!";
         $body = "Izin anda dengan subjek izin :\n{$izin->title}\nTelah kedaluarsa. Status kehadiran anda akan kembali normal.";
         return [
             'heading' => $headings,

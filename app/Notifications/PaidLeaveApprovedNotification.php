@@ -49,8 +49,8 @@ class PaidLeaveApprovedNotification extends Notification
     {
         $cuti = $this->paidLeave;
         return [
-            'heading' => $cuti->kategori->name . ' disetujui!',
-            'body' => "{$cuti->kategori->name} anda dengan subjek\n$cuti->title\n\nTelah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s'),
+            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - " . $cuti->kategori->name . ' disetujui!',
+            'body' => "{$cuti->kategori->name} anda dengan subjek : $cuti->title telah disetujui.",
             'user_id' => $notifiable->id
         ];
     }

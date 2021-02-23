@@ -14,8 +14,6 @@ use App\Transformers\Web\AttendeUserTransformer;
 use App\Transformers\Serializers\CustomSerializer;
 use App\Notifications\AttendanceCanceledNotification;
 use App\Repositories\Interfaces\AttendeRepositoryInterface;
-use App\Transformers\Export\AttendeDataTransformer;
-use App\Transformers\Export\UserAttendeTransformer;
 
 class AttendeRepository implements AttendeRepositoryInterface
 {
@@ -104,8 +102,8 @@ class AttendeRepository implements AttendeRepositoryInterface
     public function cancel($attendanceId, $reason)
     {
         $presence = Attende::where('id', $attendanceId)->first();
-        if (Storage::exists($presence->photo)) {
-            Storage::delete($presence->photo);
+        if (Storage::disk('public')->exists($presence->photo)) {
+            Storage::disk('public')->delete($presence->photo);
         }
         $update = $presence->update([
             'attend_time' => null,

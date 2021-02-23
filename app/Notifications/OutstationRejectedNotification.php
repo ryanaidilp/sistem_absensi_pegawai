@@ -53,9 +53,9 @@ class OutstationRejectedNotification extends Notification
     {
         $outstation = $this->outstation;
         $reason = $this->reason;
-        $body = "$outstation->title anda telah ditolak pada :\n" . now()->translatedFormat('l, d F Y H:i:s') . "\n\nAlasan penolakan :\n$reason";
+        $body = "Dinas Luar anda dengan subjek : $outstation->title telah ditolak.\n\nAlasan penolakan :\n$reason";
         return [
-            'heading' => "Dinas Luar ditolak!",
+            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - Dinas Luar ditolak!",
             'body' => $body,
             'user_id' => $notifiable->id
         ];

@@ -51,7 +51,7 @@ class OutstationExpiredNotification extends Notification
         $date = today()->translatedFormat('l, d F Y');
         $outstation = $this->outstation;;
         return [
-            'heading' => "Dinas Luar kedaluarsa, $date",
+            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - Dinas Luar kedaluarsa, $date",
             'body' => "Dinas Luar anda dengan subjek :\n{$outstation->title}\nTelah kedaluarsa. Status kehadiran anda akan kembali normal.",
             'user_id' => $notifiable->id
         ];
