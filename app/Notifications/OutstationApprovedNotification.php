@@ -49,8 +49,8 @@ class OutstationApprovedNotification extends Notification
     {
         $outstation = $this->outstation;
         return [
-            'heading' => 'Dinas Luar disetujui!',
-            'body' => "$outstation->title anda telah disetujui pada :\n" . now()->translatedFormat('l, d F Y H:i:s'),
+            'heading' => now()->translatedFormat('d-m-Y H:i:s') . ' - Dinas Luar disetujui!',
+            'body' => "Dinas Luar anda dengan subjek : $outstation->title telah disetujui.",
             'user_id' => $notifiable->id
         ];
     }
