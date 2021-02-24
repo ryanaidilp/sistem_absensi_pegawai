@@ -52,7 +52,7 @@ class PaidLeaveRejectedNotification extends Notification
         $cuti = $this->paidLeave;
         $reason = $this->reason;
         return [
-            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - " . $cuti->kategori->name . " ditolak!",
+            'heading' => now()->translatedFormat('d/m/Y H:i:s') . " - " . $cuti->kategori->name . " ditolak!",
             'body' => $cuti->kategori->name . " anda dengan subjek : $cuti->title telah ditolak.\n\nAlasan Penolakan :\n$reason",
             'user_id' => $notifiable->id
         ];
