@@ -41,7 +41,7 @@ class AttendeStatusUpdatedNotification extends Notification
         $presence = $this->attende;
         $date = today()->translatedFormat('l, d F Y');
         return [
-            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - Presensi berhasil!",
+            'heading' => now()->translatedFormat('d/m/Y H:i:s') . " - Presensi berhasil!",
             'body' => "Presensi $date berhasil :\nJenis Presensi : {$presence->kode_absen->tipe->name}\nStatus Kehadiran : {$presence->status_kehadiran->name}\nJam Presensi : {$presence->attend_time->translatedFormat('H:i:s')}",
             'user_id' => $notifiable->id
         ];

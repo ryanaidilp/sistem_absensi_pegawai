@@ -52,7 +52,7 @@ class PaidLeaveExpiredNotification extends Notification
         $date = today()->translatedFormat('l, d F Y');
         $cuti = $this->paidLeave;
         return [
-            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - " . $cuti->kategori->name . " kedaluarsa. $date!",
+            'heading' => now()->translatedFormat('d/m/Y H:i:s') . " - " . $cuti->kategori->name . " kedaluarsa. $date!",
             'body' => $cuti->kategori->name . " anda dengan subjek : {$cuti->title} telah kedaluarsa. Status kehadiran anda akan kembali normal.",
             'user_id' => $notifiable->id
         ];

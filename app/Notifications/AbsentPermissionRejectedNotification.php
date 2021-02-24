@@ -53,7 +53,7 @@ class AbsentPermissionRejectedNotification extends Notification
         $izin = $this->permission;
         $body = "Izin anda dengan subjek : $izin->title telah ditolak.\n\nAlasan penolakan :\n{$this->reason}";
         return [
-            'heading' => now()->translatedFormat('d-m-Y H:i:s') . " - Izin ditolak!",
+            'heading' => now()->translatedFormat('d/m/Y H:i:s') . " - Izin ditolak!",
             'body' => $body,
             'user_id' => $notifiable->id
         ];
