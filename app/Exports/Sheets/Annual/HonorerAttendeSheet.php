@@ -116,7 +116,7 @@ class HonorerAttendeSheet implements
             $conditionalStyles[] = $conditional1;
             $conditionalStyles[] = $conditional2;
             $conditionalStyles[] = $conditional3;
-            $sheet->getStyle("Z$cellIndex")->setConditionalStyles($conditionalStyles);
+            $sheet->getStyle("{$averageCell}$cellIndex")->setConditionalStyles($conditionalStyles);
         }
         $autoFilterCell = "{$averageCell}1:{$averageCell}" . ($dataCount + 4);
         $sheet->setAutoFilter($autoFilterCell);
