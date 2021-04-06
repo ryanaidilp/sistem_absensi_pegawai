@@ -70,19 +70,26 @@ class HonorerAttendeSheet implements
 
     public function styles(Worksheet $sheet)
     {
+        $lastIndex = 4 + count($this->collection()->first()['presensi']);
+        if ($lastIndex == 4) {
+            $lastIndex = 25;
+        }
+        $averageCell = \num2alpha($lastIndex + 1);
+        $dataCount = $this->collection()->count();
+        $lastCell = \num2alpha($lastIndex);
         $sheet->mergeCells('A1:A3');
         $sheet->mergeCells('B1:B3');
         $sheet->mergeCells('C1:C3');
         $sheet->mergeCells('D1:D3');
         $sheet->mergeCells('E1:E3');
-        $sheet->mergeCells('F1:Y1');
-        $sheet->mergeCells('F2:Y2');
-        $sheet->mergeCells('Z1:Z3');
-        $sheet->setCellValueExplicit('Z1', 'Rata-Rata', DataType::TYPE_STRING);
-        for ($i = 1; $i <= 13; $i++) {
+        $sheet->mergeCells("F1:{$lastCell}1");
+        $sheet->mergeCells("F2:{$lastCell}2");
+        $sheet->mergeCells("{$averageCell}1:{$averageCell}3");
+        $sheet->setCellValueExplicit("{$averageCell}1", 'Rata-Rata', DataType::TYPE_STRING);
+        for ($i = 1; $i <= $dataCount; $i++) {
             $cellIndex = $i + 3;
-            $sheet->setCellValueExplicit('Z' . $cellIndex, "=AVERAGE(F$cellIndex:Y$cellIndex)", DataType::TYPE_FORMULA);
-            $sheet->getStyle("Z$cellIndex")->getProtection()->setLocked(Protection::PROTECTION_PROTECTED);
+            $sheet->setCellValueExplicit($averageCell . $cellIndex, "=AVERAGE(F$cellIndex:{$lastCell}$cellIndex)", DataType::TYPE_FORMULA);
+            $sheet->getStyle("{$averageCell}$cellIndex")->getProtection()->setLocked(Protection::PROTECTION_PROTECTED);
             $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
             $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
             $conditional1->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_LESSTHANOREQUAL);
@@ -105,13 +112,14 @@ class HonorerAttendeSheet implements
             $conditional3->getStyle()->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKGREEN);
             $conditional3->getStyle()->getFont()->setBold(true);
 
-            $conditionalStyles = $sheet->getStyle("Z$cellIndex")->getConditionalStyles();
+            $conditionalStyles = $sheet->getStyle("{$averageCell}$cellIndex")->getConditionalStyles();
             $conditionalStyles[] = $conditional1;
             $conditionalStyles[] = $conditional2;
             $conditionalStyles[] = $conditional3;
-            $sheet->getStyle("Z$cellIndex")->setConditionalStyles($conditionalStyles);
+            $sheet->getStyle("{$averageCell}$cellIndex")->setConditionalStyles($conditionalStyles);
         }
-        $sheet->setAutoFilter('Z1:Z16');
+        $autoFilterCell = "{$averageCell}1:{$averageCell}" . ($dataCount + 4);
+        $sheet->setAutoFilter($autoFilterCell);
         return [
             1 => [
                 'font' => ['bold' => true],
@@ -189,8 +197,12 @@ class HonorerAttendeSheet implements
 
     public function columnFormats(): array
     {
+        $lastIndex = 4 + count($this->collection()->first()['presensi']);
+        if ($lastIndex == 4) {
+            $lastIndex = 25;
+        }
         return [
-            'Z' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1
+            \num2alpha($lastIndex + 1) => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1
         ];
     }
 }

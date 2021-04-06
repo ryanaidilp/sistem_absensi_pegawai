@@ -29,11 +29,13 @@ class PnsAttendeSheet implements
 {
     private $users;
     private $date;
+    private $lastCell;
 
     public function __construct($users, $date)
     {
         $this->users = $users;
         $this->date = $date;
+        $this->lastCell = 7 + \count($this->users->first()['presensi']);
     }
 
     /**
@@ -58,6 +60,9 @@ class PnsAttendeSheet implements
 
     public function styles(Worksheet $sheet)
     {
+        $averageCell = \num2alpha($this->lastCell + 1);
+        $dataCount = $this->collection()->count();
+        $lastCell = \num2alpha($this->lastCell);
         $sheet->mergeCells('A1:A3');
         $sheet->mergeCells('B1:B3');
         $sheet->mergeCells('C1:C3');
@@ -66,14 +71,14 @@ class PnsAttendeSheet implements
         $sheet->mergeCells('F1:F3');
         $sheet->mergeCells('G1:G3');
         $sheet->mergeCells('H1:H3');
-        $sheet->mergeCells('I1:AB1');
-        $sheet->mergeCells('I2:AB2');
-        $sheet->mergeCells('AC1:AC3');
-        $sheet->setCellValueExplicit('AC1', 'Rata-Rata', DataType::TYPE_STRING);
-        for ($i = 1; $i <= 20; $i++) {
+        $sheet->mergeCells("I1:{$lastCell}1");
+        $sheet->mergeCells("I2:{$lastCell}2");
+        $sheet->mergeCells("{$averageCell}1:{$averageCell}3");
+        $sheet->setCellValueExplicit("{$averageCell}1", 'Rata-Rata', DataType::TYPE_STRING);
+        for ($i = 1; $i <= $dataCount; $i++) {
             $cellIndex = $i + 3;
-            $sheet->setCellValueExplicit('AC' . $cellIndex, "=AVERAGE(I$cellIndex:AB$cellIndex)", DataType::TYPE_FORMULA);
-            $sheet->getStyle("AC$cellIndex")->getProtection()->setLocked(Protection::PROTECTION_PROTECTED);
+            $sheet->setCellValueExplicit($averageCell . $cellIndex, "=AVERAGE(I$cellIndex:{$lastCell}$cellIndex)", DataType::TYPE_FORMULA);
+            $sheet->getStyle("{$averageCell}$cellIndex")->getProtection()->setLocked(Protection::PROTECTION_PROTECTED);
             $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
             $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
             $conditional1->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_LESSTHANOREQUAL);
@@ -96,13 +101,14 @@ class PnsAttendeSheet implements
             $conditional3->getStyle()->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_DARKGREEN);
             $conditional3->getStyle()->getFont()->setBold(true);
 
-            $conditionalStyles = $sheet->getStyle("AC$cellIndex")->getConditionalStyles();
+            $conditionalStyles = $sheet->getStyle("{$averageCell}$cellIndex")->getConditionalStyles();
             $conditionalStyles[] = $conditional1;
             $conditionalStyles[] = $conditional2;
             $conditionalStyles[] = $conditional3;
-            $sheet->getStyle("AC$cellIndex")->setConditionalStyles($conditionalStyles);
+            $sheet->getStyle("{$averageCell}$cellIndex")->setConditionalStyles($conditionalStyles);
         }
-        $sheet->setAutoFilter('AC1:AC23');
+        $autoFilterCell = "{$averageCell}1:{$averageCell}" . ($dataCount + 4);
+        $sheet->setAutoFilter($autoFilterCell);
         return [
             1 => [
                 'font' => ['bold' => true],
@@ -193,7 +199,7 @@ class PnsAttendeSheet implements
     public function columnFormats(): array
     {
         return [
-            'AC' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1
+            \num2alpha($this->lastCell + 1) => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1
         ];
     }
 }
