@@ -30,7 +30,7 @@ function sendNotification($body, $heading, $userId = null)
             'app_id' => env('ONESIGNAL_APP_ID'),
             'contents' => $content,
             'headings' => $headings,
-            'include_external_user_ids' => [$userId],
+            'include_external_user_ids' => ["$userId"],
             "channel_for_external_user_ids" => "push",
         ];
     } else {
