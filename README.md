@@ -55,13 +55,13 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 
     Data ini diperlukan untuk mengecek jarak user dari kantor saat melakukan presensi. Hal ini dilakukan untuk memastikan bahwa user melakukan presensi di kantor.
 
-* **Konfigurasi**
+* **Instalasi & Konfigurasi**
   * ***Clone*** *repository* ini
   * Jalankan perintah `composer install` & `npm install`
   * Isikan konfigurasi ***database*** anda pada file **.env**
   * Jalankan perintah `php artisan migrate`
   * Jalankan perintah `php artisan voyager:install` untuk menginstall *admin panel* Voyager
-  * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create`
+  * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create` atau jalankan perintah `php artisan voyager:admin {email_anda@mail.com}` untuk menjadikan user yang sudah ada sebagai admin
   * Buat file csv berisi data user dan department lalu masukkan ke dalam folder database dengan struktur
 
     ```directory
@@ -76,13 +76,22 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
   * Jalankan perintah `php artisan db:seed`, jika tidak ada file csv pada proses sebelumnya, *comment*/hilangkan **UserSeeder** & **DepartmentSeeder** dari **DatabaseSeeder.php** sebelum menjalankan seeder
   * Untuk mengambil dan menyimpan data hari libur nasional, jalankan perintah  `php artisan holiday:generate` tambahkan option  `--year` untuk menentukan tahun libur yang di-generate (default  `--year=2021`). **Pastikan anda sudah mendapatkan API Key dari** [Calendarific API](https://calendarific.com/).
   * Buat kode absen dengan jalankan perintah `php artisan absent:code` lalu buat daftar absen dengan perintah `php artisan absent:attende`. Pastikan data **User** dan **Department** sudah ada saat menjalankan perintah ini.
+  * Sebelum masuk ke aplikasi, *comment*/hilangkan baris kode berikut dari file **voyager.php** pada folder config untuk mencegah ***error undefined route***
+  
+  ```php
+     'widgets' => [
+            "App\\Widgets\\UserWidget",
+            "App\\Widgets\\DepartmentWidget", //comment atau hapus baris ini
+        ],
+    ```
+
   * Jalankan perintah `php artisan serve` lalu kunjungi url **localhost:8000**
 
 ## To-Do List
 
 * [x] Halaman untuk menampilkan ***QR Code*** dan ***Countdown Timer***.
 * [x] ***API Backend*** untuk ***Mobile App***.
-* [x] ***Tracking*** performa pegawai (PNS & Honorer)
+* [x] ***Tracking*** kehadiran pegawai (PNS & Honorer)
 * [x] **Export** data laporan kehadiran (Excel)
   * [x] Harian
   * [x] Bulanan
