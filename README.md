@@ -57,11 +57,14 @@ Permasalahan timbul saat sebagian besar pegawai tidak jujur dalam mengisi absen 
 
 * **Instalasi & Konfigurasi**
   * ***Clone*** *repository* ini
-  * Jalankan perintah `composer install` & `npm install`
-  * Isikan konfigurasi ***database*** anda pada file **.env**
+  * Jalankan perintah `composer install`
+  * Jalankan perintah `npm install` & `npm run dev`
+  * Jalankan perintah `cp .env.example .env`
+  * Isikan konfigurasi ***database*** anda dan juga ***Environment Variable*** diatas pada file **.env**
+  * Jalankan perintah `php artisan key:generate`
   * Jalankan perintah `php artisan migrate`
   * Jalankan perintah `php artisan voyager:install` untuk menginstall *admin panel* Voyager
-  * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create` atau jalankan perintah `php artisan voyager:admin {email_anda@mail.com}` untuk menjadikan user yang sudah ada sebagai admin
+  * Setelah voyager berhasil diinstall, buat admin dengan menjalankan perintah `php artisan voyager:admin {email_anda@mail.com} --create` untuk membuat admin baru atau jalankan perintah `php artisan voyager:admin {email_anda@mail.com}` untuk menjadikan user yang sudah ada sebagai admin
   * Buat file csv berisi data user dan department lalu masukkan ke dalam folder database dengan struktur
 
     ```directory
