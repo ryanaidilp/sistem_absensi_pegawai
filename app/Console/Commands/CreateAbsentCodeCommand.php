@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Holiday;
 use Illuminate\Support\Str;
 use App\Models\AttendeType;
 use App\Models\AttendeCode;
@@ -50,6 +49,12 @@ class CreateAbsentCodeCommand extends Command
 
         $holiday = $this->holidayRepository->getToday();
         $isWeekend = today()->isWeekend();
+
+        $attendeCode = AttendeCode::whereDate('created_at', today())->get();
+        if ($attendeCode->count() > 0) {
+            $this->error('Attende code already generated!');
+            return;
+        }
 
         if (!$holiday && !$isWeekend) {
             foreach ($types as $type) {
