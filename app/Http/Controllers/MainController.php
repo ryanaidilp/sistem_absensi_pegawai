@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\AttendeAnnualExport;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Exports\AttendeDailyExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AttendeAnnualExport;
 use App\Exports\AttendeMonthlyExport;
 use Illuminate\Support\Facades\Storage;
 use App\Transformers\Web\AttendeCodeTransformer;
@@ -175,7 +175,7 @@ class MainController extends Controller
         } else if (now()->hour >= 0 && now()->hour < 8) {
             $deadline = Carbon::parse("07:00");
         } else {
-            $deadline = Carbon::parse("07:30")->addDays($days);
+            $deadline = Carbon::parse("07:00")->addDays($days);
         }
         return $deadline;
     }
