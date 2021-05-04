@@ -414,8 +414,8 @@ class UserController extends Controller
                 ],
                 'absent' => [
                     'day' => $yearly_absent_count,
-                    'percentage' => $total_work_day > 0 ?  round($yearly_absent_count / 43 * 100, 2) : 0,
-                    'limit' => 43
+                    'percentage' => $total_work_day > 0 ?  (round($yearly_absent_count / 46 * 100, 2) > 100 ? 100 : round($yearly_absent_count / 46 * 100, 2)) : 0,
+                    'limit' => 46
                 ],
                 'annual_leave' => [
                     'day' => $total_annual_leave,
