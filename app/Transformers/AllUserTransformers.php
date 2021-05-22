@@ -40,15 +40,17 @@ class AllUserTransformers extends TransformerAbstract
     public function transform(User $user)
     {
         return [
+            'id' => $user->id,
             'nip' => $user->nip ?? "",
-            'name' => $user->name,
             'rank' => Str::replaceFirst('Tingkat', 'Tk.', optional($user->golongan)->rank ?? ''),
             'group' => optional($user->golongan)->group ?? '',
-            'status' => $user->status,
-            'department' => $user->departemen->name,
-            'position' => $user->position,
+            'name' => $user->name,
             'phone' => $user->phone ?? "",
-            'email' => $user->email ?? "",
+            'gender' => $user->gender->name,
+            'department' => $user->departemen->name,
+            'status' => $user->status,
+            'position' => $user->position,
+            'is_weekend' => today()->isWeekend(),
             'presence' => $this->presence ?? []
         ];
     }

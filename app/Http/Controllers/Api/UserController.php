@@ -291,6 +291,7 @@ class UserController extends Controller
                 'attendances' => $attendes->map(function ($attende) {
                     $attend_date = Carbon::parse($attende->created_at);
                     $start_time = explode(':', "{$attende->kode_absen->start_time}");
+                    $end_time = explode(':', "{$attende->kode_absen->end_time}");
                     $start_time = Carbon::create(
                         $attend_date->year,
                         $attend_date->month,
@@ -298,13 +299,28 @@ class UserController extends Controller
                         $start_time[0],
                         $start_time[1]
                     );
+                    $end_time = Carbon::create(
+                        $attend_date->year,
+                        $attend_date->month,
+                        $attend_date->day,
+                        $end_time[0],
+                        $end_time[1]
+                    );
                     return [
+                        'id' => $attende->id,
+                        'date' => $attende->created_at->format('Y-m-d'),
                         'absent_type' => $attende->kode_absen->tipe->name,
                         'attend_time' => !is_null($attende->attend_time) ? Carbon::parse($attende->attend_time)->format('H:i:s') : "-",
                         'attend_status' => $attende->status_kehadiran->name,
                         'start_time' => Carbon::parse($start_time)->translatedFormat('Y-m-d H:i:s'),
+                        'end_time' => Carbon::parse($end_time)->translatedFormat('Y-m-d H:i:s'),
                         'photo' => is_null($attende->photo) ? "" : env('MEDIA_URL') . Storage::url($attende->photo),
-                        'address' => $attende->address ?? ""
+                        'address' => $attende->address ?? "",
+                        'location' => [
+                            'latitude' => (float) $attende->latitude,
+                            'longitude' => (float) $attende->longitude,
+                            'address' => $attende->address ?? ""
+                        ],
                     ];
                 })
             ];
