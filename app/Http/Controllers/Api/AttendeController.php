@@ -54,39 +54,39 @@ class AttendeController extends Controller
         }
 
         $distance = getDistance($request->latitude, $request->longitude);
-        if ($distance > 0.5) {
+        if ($distance > 0.6) {
             Log::notice("user: {$request->user()->name}\njarak: $distance\nlokasi:{$request->address}");
             $distance = number_format($distance, 2, ',', '.');
             sendNotification("Percobaan absen diluar kantor:\nPegawai : {$request->user()->name}\nJarak : $distance km\nLokasi :\n{$request->address}", 'Pelanggaran terdeteksi!', 2);
-            return setJson(false, "Lokasi tidak sesuai", [], 400, ['message' => "Sistem mendeteksi anda berada $distance km dari kantor!"]);
+            return setJson(false, "Lokasi tidak sesuai", [], 400, ['message' => ["Sistem mendeteksi anda berada $distance km dari kantor!"]]);
         }
 
         $code = $this->attendeCodeRepository->getByCode($request->code);
 
         if (!$code) {
-            return setJson(false, 'Gagal!', [], 404, ['message' => 'Kode absen tidak valid!']);
+            return setJson(false, 'Gagal!', [], 404, ['message' => ['Kode absen tidak valid!']]);
         }
 
         if (Carbon::parse($code->end_time) <= now()) {
             Log::notice("user: {$request->user()->name}\nPaksa masuk absen yang sudah selesai");
             sendNotification("Percobaan absen yang sudah selesai:\nPegawai : {$request->user()->name}\nAbsen : {$code->tipe->name}", 'Pelanggaran terdeteksi!', 2);
-            return setJson(false, 'Gagal!', [], 400, ['message' => 'Kode absen sudah tidak dapat digunakan!']);
+            return setJson(false, 'Gagal!', [], 400, ['message' => ['Kode absen sudah tidak dapat digunakan!']]);
         }
 
         if (Carbon::parse($code->start_time) >= now()) {
             Log::notice("user: {$request->user()->name}\nAbsen diluar waktu");
             sendNotification("Percobaan absen yang belum mulai:\nPegawai : {$request->user()->name}\nAbsen : {$code->tipe->name}", 'Pelanggaran terdeteksi!', 2);
-            return setJson(false, 'Pelanggaran!', [], 400, ['message' => 'Tidak boleh melakukan presensi diluar jadwal!']);
+            return setJson(false, 'Pelanggaran!', [], 400, ['message' => ['Tidak boleh melakukan presensi diluar jadwal!']]);
         }
 
         $attende = $this->attendeRepository->getByUserAndCode($request->user()->id, $code->id);
 
         if (!$attende) {
-            return setJson(false, 'Data presensi tidak ditemukan!', [], 404, ['message' => 'Data presensi tidak ditemukan!']);
+            return setJson(false, 'Data presensi tidak ditemukan!', [], 404, ['message' => ['Data presensi tidak ditemukan!']]);
         }
 
         if (!is_null($attende->attend_time)) {
-            return setJson(false, 'Anda sudah melakukan presensi!', [], 400, ['message' => 'Anda sudah melakukan presensi!']);
+            return setJson(false, 'Anda sudah melakukan presensi!', [], 400, ['message' => ['Anda sudah melakukan presensi!']]);
         }
 
         $update = $this->attendeRepository->presence($request, $code, $attende);
@@ -102,7 +102,7 @@ class AttendeController extends Controller
             );
         }
 
-        return setJson(false, 'Kesalahan tidak diketahui!', [], 400, ['message' => 'Kesalahan tidak diketahui!']);
+        return setJson(false, 'Kesalahan tidak diketahui!', [], 400, ['message' => ['Kesalahan tidak diketahui!']]);
     }
 
     public function index(Request $request)
@@ -122,7 +122,7 @@ class AttendeController extends Controller
     public function cancel(Request $request)
     {
         if ($request->user()->position !== 'Camat') {
-            return setJson(false, 'Pelanggaran', [], 403, ['message' => 'Anda tidak memiliki izin untuk mengakses bagian ini!']);
+            return setJson(false, 'Pelanggaran', [], 403, ['message' => ['Anda tidak memiliki izin untuk mengakses bagian ini!']]);
         }
 
         $validator = Validator::make(
@@ -152,6 +152,6 @@ class AttendeController extends Controller
             );
         }
 
-        return setJson(false, 'Kesalahan tidak diketahui!', [], 400, ['message' => 'Kesalahan tidak diketahui!']);
+        return setJson(false, 'Kesalahan tidak diketahui!', [], 400, ['message' => ['Kesalahan tidak diketahui!']]);
     }
 }
