@@ -102,9 +102,6 @@ class AttendeRepository implements AttendeRepositoryInterface
     public function cancel($attendanceId, $reason)
     {
         $presence = Attende::where('id', $attendanceId)->first();
-        if (Storage::disk('public')->exists($presence->photo)) {
-            Storage::disk('public')->delete($presence->photo);
-        }
         $update = $presence->update([
             'attend_time' => null,
             'attende_status_id' => Attende::ABSENT,
@@ -145,6 +142,11 @@ class AttendeRepository implements AttendeRepositoryInterface
         }
         $realImage = base64_decode($request->photo);
         $imageName = now()->format('d_m_Y') . "-" . $request->file_name;
+
+
+        if (!is_null($attende->photo) && Storage::disk('public')->exists(optional($attende)->photo)) {
+            Storage::disk('public')->delete($attende->photo);
+        }
 
         Storage::disk('public')->put("presensi/" . $attende->pegawai->name . "/" . $code->tipe->name . "/$imageName",  $realImage);
 
