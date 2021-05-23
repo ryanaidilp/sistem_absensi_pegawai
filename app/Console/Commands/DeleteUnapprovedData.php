@@ -43,13 +43,10 @@ class DeleteUnapprovedData extends Command
      */
     public function handle()
     {
-        DB::connection()->enableQueryLog();
         $outstations = Outstation::where('is_approved', 0)
             ->whereDate('created_at', '<=', Carbon::now()->subWeeks(2))
-            ->explain();
-        $queries = DB::getQueryLog();
-        dd($queries);
-        die();
+            ->get();
+
         foreach ($outstations as  $outstation) {
             if (Storage::disk('public')->exists($outstation->photo)) {
                 Storage::disk('public')->delete($outstation->photo);
