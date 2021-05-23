@@ -107,7 +107,7 @@ class AttendeRepository implements AttendeRepositoryInterface
             'attende_status_id' => Attende::ABSENT,
             'latitude' => 0,
             'longitude' => 0,
-            'address' => null
+            'address' => $reason
         ]);
 
         if ($update) {
