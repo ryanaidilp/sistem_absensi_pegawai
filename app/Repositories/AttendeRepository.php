@@ -105,7 +105,6 @@ class AttendeRepository implements AttendeRepositoryInterface
         $update = $presence->update([
             'attend_time' => null,
             'attende_status_id' => Attende::ABSENT,
-            'photo' => null,
             'latitude' => 0,
             'longitude' => 0,
             'address' => null
