@@ -53,8 +53,8 @@ class DeleteUnapprovedData extends Command
             }
 
             $outstation->delete() ?
-                info('Successfully delete Permission') :
-                info('Failed to delete Permission ' . $outstation->id);
+                info('Successfully delete Outstation') :
+                info('Failed to delete Outstation ' . $outstation->id);
         }
 
         $leaves = PaidLeave::where('is_approved', 0)
