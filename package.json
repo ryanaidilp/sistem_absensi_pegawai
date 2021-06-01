@@ -11,7 +11,7 @@
     },
     "devDependencies": {
         "@tailwindcss/postcss7-compat": "^2.1.2",
-        "autoprefixer": "^10.2.5",
+        "autoprefixer": "^10.2.6",
         "axios": "^0.21",
         "chart.js": "^2.9.4",
         "chartjs-plugin-datalabels": "^0.7.0",
@@ -28,7 +28,7 @@
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.1.2",
         "vue": "^2.5.17",
         "vue-chartjs": "^3.5.1",
-        "vue-loader": "^15.9.5",
+        "vue-loader": "^15.9.7",
         "vue-template-compiler": "^2.6.10",
         "vue2-datepicker": "^3.9.0",
         "vue2-flip-countdown": "^0.11.1"
@@ -36,7 +36,7 @@
     "dependencies": {
         "@inertiajs/inertia": "^0.8.7",
         "@inertiajs/inertia-vue": "^0.4.3",
-        "@inertiajs/progress": "^0.2.4",
+        "@inertiajs/progress": "^0.2.5",
         "portal-vue": "^2.1.7",
         "v-viewer": "^1.5.1"
     }
